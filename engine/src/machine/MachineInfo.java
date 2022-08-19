@@ -15,5 +15,14 @@ public interface MachineInfo {
 
     public Reflector getReflector();
 
+    public int getNumOfRotors();
+
+
     public Plugboard getPlugboard();
+    public String getCurrentConfiguration();
+
+
+    public int getMessageCount();
+
+
 }

@@ -4,14 +4,18 @@ import auxiliary.RomanNumeral;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public interface IEngine {
+public interface IEngine extends Serializable {
 
     public EngineResponse<?> loadMachineFromXml(File xml) throws FileNotFoundException, JAXBException;
 
     public EngineResponse<?> displayMachine();
+
+    public EngineResponse<?> showHistory();
+
 
 
 
@@ -25,16 +29,23 @@ public interface IEngine {
      * @param text input text for the machine to be encrypted or decrypted
      * @return processed text
      */
-    public String processText(String text);
+    public EngineResponse<?> processText(String text);
 
 
     /**
      * Resets enigma machine to initial setup - all rotors are returned to initial positions.
      */
     public void resetMachine();
+
+
+    public int getNumOfReflectors();
+
+    public int getNumOfRotors();
     
-    
-    
+    public EngineResponse<?> getEnigmaSettings();
+
+
     public boolean isLoaded();
+    public boolean isMachinePresent();
 
 }

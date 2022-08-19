@@ -1,15 +1,15 @@
 package machine;
+import auxiliary.Message;
+import java.io.Serializable;
 
-import java.util.List;
-
-public interface Enigma extends MachineInfo {
+public interface Enigma extends MachineInfo, Serializable {
 
 
     /**
      * @param text  input text the operator will give to the machine.Enigma machine
      * @return outputs the encrypted string processed by the machine.Enigma
      */
-    public String processText(String text);
+    public Message processText(String text);
 
     /**
      * Reset machine to initial configurations - all rotors go to initial positions
@@ -22,6 +22,7 @@ public interface Enigma extends MachineInfo {
      */
     public void printMachine();
     public void printHistory();
+
 
 
 

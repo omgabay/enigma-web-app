@@ -1,10 +1,11 @@
 package machine.parts;
 import auxiliary.Alphabet;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Plugboard {
+public class Plugboard implements Serializable {
     private HashMap<Character,Character> plugboardMapper;
     private Alphabet abc;
 
@@ -45,19 +46,21 @@ public class Plugboard {
     }
 
 
-    /*public String toString(){
+    public String toString(){
         if(plugboardMapper.isEmpty())
             return "";
         StringBuilder res = new StringBuilder();
-        for(char letter : abc.getABC()){
-            if(plugboardMapper.containsKey(letter)) {
-                if (res.length() > 0)
+        for (Map.Entry<Character,Character> entry:this.plugboardMapper.entrySet()) {
+            char key = entry.getKey();
+            char value = entry.getValue();
+            if(key < value){
+                if(res.length() != 0)
                     res.append(',');
-                res.append(letter + '|' + plugboardMapper.get(letter));
+                res.append(key).append('|').append(value);
             }
         }
         return '<' + res.toString() + '>';
-    }*/
+    }
 
 
 }

@@ -4,12 +4,13 @@ import exceptions.InvalidConfigurationException;
 import generated.CTEReflect;
 import generated.CTEReflector;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 
-public class Reflector {
+public class Reflector implements Serializable {
     private HashMap<Integer, Integer> reflectorMapping;
 
     private RomanNumeral id;

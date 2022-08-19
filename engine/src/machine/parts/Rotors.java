@@ -2,9 +2,10 @@ package machine.parts;
 
 import auxiliary.Alphabet;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Rotors {
+public class Rotors implements Serializable {
 
     private LinkedList<Rotor> rotors;
     private List<Integer> initialConfig;
@@ -20,6 +21,13 @@ public class Rotors {
             initialConfig.add(r.getRotorPosition());
         }
 
+    }
+
+    public void resetRotors(){
+        Iterator<Integer> it = this.initialConfig.iterator();
+        for (Rotor r: this.rotors) {
+            r.setPosition(it.next());
+        }
     }
 
 
@@ -44,7 +52,6 @@ public class Rotors {
     }
 
     private void rotateFirstRotor() {
-        Rotor rotor = this.rotors.getFirst();
         Iterator<Rotor> it = this.rotors.iterator();
         boolean keepRotate;
         do{
@@ -72,13 +79,66 @@ public class Rotors {
         sb.append('\n');
         System.out.print(sb);
         return abc.getOrder(output);
-
     }
 
     public Iterator<Rotor> getIterator(){
         return rotors.iterator();
     }
 
+    public List<Character> getCurrentPositions(){
+        List<Character> res = new ArrayList<>();
+        Iterator<Rotor> it = rotors.descendingIterator();
+        while(it.hasNext()){
+            res.add(it.next().getCurrentPosition());
+        }
+        return res;
+    }
 
 
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+
+
+        // Printing Rotor Initial Setup -
+
+        Iterator<Rotor> it  = rotors.descendingIterator();
+        boolean first = true;
+        while(it.hasNext()){
+            if(first){
+                sb.append('<');
+                first = false;
+            }else{
+                sb.append(',');
+            }
+            sb.append(it.next().getID());
+        }
+        sb.append('>');
+        it = rotors.descendingIterator();
+        first = true;
+        while(it.hasNext()){
+            if(first){
+                sb.append('<');
+                first = false;
+            }else{
+                sb.append(',');
+            }
+            sb.append(it.next().getRotorInitConfig());
+        }
+        sb.append('>');
+        return sb.toString();
+    }
+
+
+    public int size() {
+        return this.rotors.size();
+    }
+
+    public List<Integer> getRotorIDs(){
+        Iterator<Rotor> it = this.rotors.descendingIterator();
+        List<Integer> ids = new ArrayList<>();
+        while(it.hasNext()){
+            ids.add(it.next().getID());
+        }
+        return ids;
+    }
 }

@@ -4,10 +4,10 @@ import exceptions.EnigmaException;
 import exceptions.InvalidConfigurationException;
 import generated.CTEPositioning;
 import generated.CTERotor;
-
+import java.io.Serializable;
 import java.util.*;
 
-public class Rotor {
+public class Rotor implements Serializable {
     private final int id;
     private int initialPosition;
     private int rotorPosition;
@@ -17,7 +17,7 @@ public class Rotor {
     private ArrayList<Integer> rotorMapToOutput;
     private ArrayList<Integer> rotorMapToInput;
 
-
+    private char rotorInitConfig;
     private ArrayList<Character> rightColumn;
     private ArrayList<Character> leftColumn;
 
@@ -32,6 +32,7 @@ public class Rotor {
         this.id = cteRotor.getId();
         this.rotorSize = abc.size();
         this.rotorPosition = 0;
+        this.rotorInitConfig = abc.getLetter(0);
         leftColumn = new ArrayList<>();
         rightColumn = new ArrayList<>();
         letterToRight = new HashMap<>();
@@ -119,12 +120,32 @@ public class Rotor {
     }
 
 
-    public void setPosition(int position) {
-        while(rotorPosition != position){
+    public void setInitialPosition(char position) {
+        this.rotorInitConfig = position;
+        char curr = rightColumn.get(0);
+        while(curr != position){
+            leftColumn.add(leftColumn.remove(0));
+            rightColumn.add(rightColumn.remove(0));
+            rotorPosition++;
+            rotorPosition %= rotorSize;
+            curr = rightColumn.get(0);
+        }
+    }
+
+    public void setPosition(int position){
+        while(position != rotorPosition){
             leftColumn.add(leftColumn.remove(0));
             rightColumn.add(rightColumn.remove(0));
             rotorPosition++;
             rotorPosition %= rotorSize;
         }
+    }
+
+    public char getRotorInitConfig(){
+        return this.rotorInitConfig;
+    }
+
+    public char getCurrentPosition(){
+        return this.rightColumn.get(0);
     }
 }

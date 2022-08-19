@@ -21,10 +21,6 @@ public class MachineSettings{
         return rotorsCount;
     }
 
-    public int getAlphabetSize(){
-        return abc.size();
-    }
-
     public Alphabet getAlphabet() {return abc;}
 
     public RomanNumeral getMaximalReflector(){return RomanNumeral.getRomanFromInt(numOfReflectors);}

@@ -1,8 +1,9 @@
 package auxiliary;
+import java.io.Serializable;
 import java.util.HashMap;
 
 
-public class Alphabet{
+public class Alphabet implements Serializable {
     private final String abc;
     private final HashMap<Character, Integer> order;
     public Alphabet(String alphabet){
@@ -31,5 +32,10 @@ public class Alphabet{
     public char [] getABC(){ return abc.toCharArray();}
 
     public int size() {return abc.length();}
+
+    @Override
+    public String toString(){
+        return abc;
+    }
 
 }

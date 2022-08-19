@@ -23,9 +23,13 @@ import exceptions.WrongFileFormatException;
 public class Engine implements IEngine {
     private Enigma enigmaMachine;
     private boolean isLoaded;
+    private boolean isMachinePresent;
     private List<Integer> rotorsInitialConfig;
     private List<Rotor> rotorList;
     private List<Reflector> reflectorList;
+
+    private final List<History> histories;
+    private History currentHistory;
 
     // machine instance variables
     private Alphabet alphabet;
@@ -37,7 +41,10 @@ public class Engine implements IEngine {
         this.rotorList = new ArrayList<>();
         this.reflectorList = new ArrayList<>(5);
         this.enigmaMachine = null;
+        this.histories = new ArrayList<>();
+        this.currentHistory = null;
         this.isLoaded = false;
+        this.isMachinePresent = false;
     }
 
     @Override
@@ -91,9 +98,12 @@ public class Engine implements IEngine {
     }
 
     @Override
-    public EngineResponse<Integer> displayMachine() {
-        return new EngineResponse<>(3, true);
+    public EngineResponse<MachineInfo> displayMachine() {
+
+        return new EngineResponse<>((MachineInfo) enigmaMachine, true);
     }
+
+
 
     @Override
     public void setupMachine(List<Integer> rotorIDs, List<Character> rotorPositions, RomanNumeral reflectorID, Map<Character, Character> plugs) {
@@ -101,12 +111,17 @@ public class Engine implements IEngine {
         Iterator<Character> it = rotorPositions.listIterator();
         for (int id : rotorIDs) {
             Rotor r = this.rotorList.get(id-1);
-            r.setPosition(alphabet.getOrder(it.next()));
+            r.setInitialPosition(it.next());
             machineRotors.add(r);
         }
         Reflector reflector = getReflectorByID(reflectorID).orElseThrow(ReflectorNotFound::new);
         Plugboard pb = new Plugboard(plugs, alphabet);
-        this.enigmaMachine = new EnigmaMachine(machineRotors,reflector, pb, alphabet, true);
+        this.enigmaMachine = new EnigmaMachine(machineRotors,reflector, pb, alphabet);
+        if(currentHistory != null){
+            this.histories.add(currentHistory);
+        }
+        this.currentHistory = new History(enigmaMachine.toString());
+        this.isMachinePresent = true;
     }
 
     @Override
@@ -118,41 +133,93 @@ public class Engine implements IEngine {
             int i = r.nextInt(rotorList.size());
             if (!rotors.contains(i)) {
                 Rotor rotor = rotorList.get(i);
-                rotor.setPosition(r.nextInt(alphabet.size()));
                 machineRotors.add(rotor);
                 rotors.add(i);
             }
         }
 
+        // Set Rotors at Random Position
+        for(Rotor rotor : machineRotors){
+            int pos = r.nextInt(this.alphabet.size());
+            rotor.setPosition(pos);
+        }
+
+        // Pick Reflector at Random
         Reflector machineReflector = reflectorList.get(r.nextInt(this.reflectorList.size()));
+
+        // Random Generate Plugboard
         Plugboard pb = new Plugboard(this.alphabet);
         for (char letter : alphabet.getABC()) {
             int probability = r.nextInt(100);
             if(probability >= 90){
                 char letter2  = alphabet.getLetter(r.nextInt(alphabet.size()));
                 if(letter != letter2){
+                    // addToPlugboard will not add the pair in case one of the letters is in use
                     pb.addToPlugboard(letter,letter2);
                 }
             }
         }
-        enigmaMachine = new EnigmaMachine(machineRotors, machineReflector, pb, alphabet, true);
+
+        enigmaMachine = new EnigmaMachine(machineRotors, machineReflector, pb, alphabet);
+        this.isMachinePresent = true;
+        this.histories.add(this.currentHistory);
+        this.currentHistory = new History(enigmaMachine.toString());
+
+
         MachineSetup ms = new MachineSetup((MachineInfo)enigmaMachine);
         return new EngineResponse<>(ms,true);
     }
 
     @Override
-    public String processText(String text) {
-        return enigmaMachine.processText(text);
+    public EngineResponse<Message> processText(String text) {
+        Message m = enigmaMachine.processText(text);
+        currentHistory.add(m);
+        return new EngineResponse<>(m,true);
     }
 
     @Override
     public void resetMachine() {
+        this.enigmaMachine.resetMachine();
+    }
 
+    @Override
+    public int getNumOfReflectors() {
+        return this.reflectorList.size();
+    }
+
+    @Override
+    public int getNumOfRotors() {
+        return this.rotorList.size();
+    }
+
+    @Override
+    public EngineResponse<MachineSettings> getEnigmaSettings() {
+        if(!this.isLoaded){
+            return new EngineResponse<>(null,false);
+        }
+
+        MachineSettings ms = new MachineSettings(rotorsCount, rotorList.size(), reflectorList.size(), this.alphabet);
+        return new EngineResponse<>(ms, true);
+    }
+
+    @Override
+    public EngineResponse<?> showHistory() {
+        if(currentHistory == null){
+            return new EngineResponse<>(null,false);
+        }
+        List<History> res = new ArrayList<>(histories);
+        res.add(currentHistory);
+        return new EngineResponse<>(res,true);
     }
 
     @Override
     public boolean isLoaded() {
         return isLoaded;
+    }
+
+    @Override
+    public boolean isMachinePresent() {
+        return isMachinePresent;
     }
 
     public void checkForErrors() throws EnigmaException{
