@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.*;
 import machine.Enigma;
 import machine.EnigmaMachine;
-import machine.MachineInfo;
+import auxiliary.MachineInfo;
 import machine.parts.Plugboard;
 import machine.parts.Reflector;
 import machine.parts.Rotor;
@@ -72,7 +72,7 @@ public class Engine implements IEngine {
         {
             System.out.println("alphabet size:" + alphabet.size());
             System.out.println(alphabet.getABC());
-            throw new InvalidConfigurationException("You should have an even number of letters in your alphabet");
+            throw new InvalidConfigurationException("\nInvalid configuration file, the machine alphabet has to have an even number of letters\n");
         }
         this.rotorsCount = m.getRotorsCount();
         this.rotorList = new ArrayList<>();
@@ -80,7 +80,7 @@ public class Engine implements IEngine {
             rotorList.add(new Rotor(rotor, this.alphabet));
         }
         if(rotorsCount < 2 || rotorsCount > 99 || rotorsCount > rotorList.size()){
-            String msg = "Invalid Rotors Count - make sure you use at least 2 rotors and no more than the allowed amount";
+            String msg = "Invalid configuration, rotors-count has to be at least 2 and no bigger than the available rotors.";
             throw new InvalidConfigurationException(msg);
         }
         // Sorting rotorList by ID
@@ -93,6 +93,7 @@ public class Engine implements IEngine {
 
         checkForErrors();
         isLoaded = true;
+        isMachinePresent = false;
         MachineSettings settings = new MachineSettings(rotorsCount, rotorList.size(), reflectorList.size(), this.alphabet);
         return new EngineResponse<>(settings, true);
     }
@@ -161,11 +162,11 @@ public class Engine implements IEngine {
         }
 
         enigmaMachine = new EnigmaMachine(machineRotors, machineReflector, pb, alphabet);
-        this.isMachinePresent = true;
-        this.histories.add(this.currentHistory);
+        if(currentHistory != null){
+            this.histories.add(currentHistory);
+        }
         this.currentHistory = new History(enigmaMachine.toString());
-
-
+        this.isMachinePresent = true;
         MachineSetup ms = new MachineSetup((MachineInfo)enigmaMachine);
         return new EngineResponse<>(ms,true);
     }
@@ -235,7 +236,7 @@ public class Engine implements IEngine {
         }
 
         for (Rotor r : rotorList) {
-            r.validateRotor();
+            r.validateRotor(this.alphabet);
         }
 
         if(reflectorList.size() > 5 || reflectorList.isEmpty()){
@@ -246,7 +247,7 @@ public class Engine implements IEngine {
 
         EnumSet<RomanNumeral> romans = EnumSet.noneOf(RomanNumeral.class);
         for (Reflector ref : reflectorList){
-            ref.validateReflector();
+            ref.validateReflector(alphabet);
             RomanNumeral rn = ref.getID();
             if(romans.contains(rn)){
                 String msg = "Reflector " +rn.name() + " is duplicated!";

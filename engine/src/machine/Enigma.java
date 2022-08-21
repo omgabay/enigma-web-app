@@ -1,4 +1,5 @@
 package machine;
+import auxiliary.MachineInfo;
 import auxiliary.Message;
 import java.io.Serializable;
 
@@ -16,12 +17,8 @@ public interface Enigma extends MachineInfo, Serializable {
      */
     public void resetMachine();
 
-    /**
-     * Prints Machine configuration, this includes the following:
-     *
-     */
-    public void printMachine();
-    public void printHistory();
+
+
 
 
 

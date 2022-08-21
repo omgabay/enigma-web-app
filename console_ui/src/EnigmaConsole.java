@@ -1,5 +1,6 @@
 import auxiliary.*;
-import machine.MachineInfo;
+import auxiliary.MachineInfo;
+import exceptions.EnigmaException;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -71,13 +72,8 @@ public class EnigmaConsole {
                    System.out.println("to exit you can also press q");
                    break;
            }
-//            try {
-//                Thread.sleep(1000);
                 pressEnterToContinue();
 
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
         }while(loop);
         System.out.println("Goodbye!");
         System.out.print("Going to sleep zzz");
@@ -191,25 +187,28 @@ public class EnigmaConsole {
     }
 
     public static void loadXML(){
-        System.out.println("To start encrypting messages please give me the path to the machine configuration file");
+        System.out.println("To start encrypting messages please give the full path to Enigma configuration file");
         System.out.println("The file should be in .xml format");
-        String folder = "C:\\Users\\omerg\\IdeaProjects\\Enigma\\console_ui\\src\\resources\\";
         String fileName = reader.nextLine().trim();
 
         try{
-            File xml = new File(folder+fileName);
+            File xml = new File(fileName);
+            if(!xml.exists()){
+                throw new FileNotFoundException(fileName);
+            }
             settings = (MachineSettings) engine.loadMachineFromXml(xml).getData();
             System.out.printf("Machine loaded successfully from %s", xml.getName());
             // get file name without extension
             int pos = xml.getName().lastIndexOf('.');
             configFileName = xml.getName().substring(0,pos);
-        }catch(FileNotFoundException e){
-            System.out.println("Configuration file was not found, make sure you gave the right path!");
+        }
+        catch(FileNotFoundException e){
+            System.out.println("File '" + e.getMessage() + "' was not found, please check your path!");
         }catch (JAXBException e) {
             e.printStackTrace();
             System.out.println("XML parsing error. Please check that your xml is in the right format and close the file if it's open");
         }
-        catch (RuntimeException e){
+        catch (EnigmaException e){
             System.out.println(e.getMessage());
         }
     }
@@ -222,21 +221,25 @@ public class EnigmaConsole {
         List<Integer> rotorIDs = readRotorsList();
         List<Character> positions = readRotorsPositions();
         RomanNumeral reflectorID = readReflectorChoice();
-        HashMap<Character,Character> pb = readPlugboard();
-
-        try {
-            engine.setupMachine(rotorIDs, positions, reflectorID, pb);
-        }catch(RuntimeException re){
-            System.out.print("Error in Setup - " + re.getMessage());
+        if(reflectorID == RomanNumeral.Undefined){
+            // Setup phase was stopped by the user
             return;
         }
 
-        System.out.println("Printing your choices");
-        System.out.println("Rotors - " + rotorIDs);
-        System.out.println("Rotors Positions - " + positions);
-        System.out.println("Reflector used " + reflectorID);
-        System.out.print("Plugboard chosen " + pb);
+        HashMap<Character,Character> pb = readPlugboard();
 
+        try {
+            System.out.println("Printing your choices");
+            System.out.println("Rotors - " + rotorIDs);
+            System.out.println("Rotors Positions - " + positions);
+            System.out.println("Reflector used " + reflectorID);
+            System.out.print("Plugboard chosen " + pb);
+            Collections.reverse(rotorIDs);
+            Collections.reverse(positions);
+            engine.setupMachine(rotorIDs, positions, reflectorID, pb);
+        }catch(RuntimeException re){
+            System.out.print("Error in Setup - " + re.getMessage());
+        }
     }
 
     private static HashMap<Character, Character> readPlugboard() {
@@ -285,24 +288,51 @@ public class EnigmaConsole {
 
     private static RomanNumeral readReflectorChoice() {
         RomanNumeral max = settings.getMaximalReflector();
-        boolean failed = false;
-        RomanNumeral response;
-        do{
-            System.out.println("Please choose your reflector from " + RomanNumeral.I+ " to "+ max);
-            String input = reader.nextLine().trim().toUpperCase();
-            try {
-                response = RomanNumeral.valueOf(input);
-                failed = false;
-            }catch (Exception e){
-                response = RomanNumeral.Undefined;
+        if (max == RomanNumeral.I) {
+            System.out.println("Your Enigma uses Reflector " + RomanNumeral.I + " the only reflector available");
+            return RomanNumeral.I;
+        }
+        RomanNumeral input = RomanNumeral.Undefined;
+        do {
+            System.out.println("Please choose which reflector to work with, input a number from the options menu");
+            for (int i = 1; i <= max.getValue(); i++) {
+                System.out.println(i + ". " + RomanNumeral.getRomanFromInt(i));
             }
-            if(response == RomanNumeral.Undefined || response.getValue() > max.getValue()){
-                failed = true;
-                System.out.println("Invalid Roman Number - please make sure your input is a roman in range\n\n");
+
+            String tmp = reader.nextLine().trim();
+            char choice = Character.toLowerCase(tmp.charAt(0));
+            if (choice-'0' > max.getValue()) {
+                choice = 0;
             }
-        }while(failed);
-        return response;
+            System.out.println("Choice is "+ choice);
+            switch (choice) {
+                case '1':
+                    input = RomanNumeral.I;
+                    break;
+                case '2':
+                    input = RomanNumeral.II;
+                    break;
+                case '3':
+                    input =  RomanNumeral.III;
+                    break;
+                case '4':
+                    input = RomanNumeral.IV;
+                    break;
+                case '5':
+                    input =  RomanNumeral.V;
+                    break;
+                default:
+                    System.out.println("No reflector matching your choice.");
+                    System.out.println("Do you want to try again? Pressing 'n' will exit the setup phase, any other key to try again");
+                    char c = reader.nextLine().charAt(0);
+                    if (Character.toLowerCase(c) == 'n') {
+                        return RomanNumeral.Undefined;
+                    }
+            }
+        }while(input == RomanNumeral.Undefined);
+        return input;
     }
+
 
 
     private static void createRandomSetup(){
@@ -326,7 +356,7 @@ public class EnigmaConsole {
             return;
         }
         System.out.println("Input your text to Enigma...");
-        String text = reader.nextLine().trim();
+        String text = reader.nextLine().trim().toUpperCase();
         Alphabet abc = settings.getAlphabet();
         StringBuilder sb = new StringBuilder();
         boolean errMessage = false;
@@ -364,7 +394,7 @@ public class EnigmaConsole {
         char c = reader.nextLine().charAt(0);
         if(Character.toLowerCase(c) == 'y') {
             engine.resetMachine();
-           System.out.println("Reset to Enigma was finished successfully");
+           System.out.println("Reset to Enigma finished successfully");
         }else{
             System.out.println("Reset was declined by the user");
         }
@@ -392,13 +422,17 @@ public class EnigmaConsole {
         List<Integer> rotorsList = new ArrayList<>();
 
         System.out.println("Step 1: Please choose " + rotorCount +" rotors");
-        System.out.println("\trotors should be numbers in range (1," + maximalRotor + ")");
-        int i = 0;
-        while(i < rotorCount){
+        System.out.println("rotors should be numbers in range 1-" + maximalRotor + "  (inclusive)");
+        System.out.println("You can separate the numbers with whitespace");
+        int count = 0;
+        Scanner integers = new Scanner(System.in);
+        integers.useDelimiter("[^0-9]+");
+        while(count < rotorCount){
             try {
-                int id = reader.nextInt();
+                int id = integers.nextInt();
                 if(id < 1 || id > maximalRotor){
                     System.out.printf("\nrotor %d is out of range\n", id);
+                    continue;
                 }
                 if(rotors.contains(id)){
                     System.out.printf("rotor %d was already chosen!", id);
@@ -406,37 +440,36 @@ public class EnigmaConsole {
                 }
                 rotors.add(id);
                 rotorsList.add(id);
-                i++;
+                count++;
             }catch(InputMismatchException e){
                 System.out.println("please make sure to enter numbers");
             }
             catch (NoSuchElementException e){
-                System.out.printf("you need to choose %d more rotors\n", rotorCount-i);
+                System.out.printf("you need to choose %d more rotors\n", rotorCount-count);
             }
         }
+
     return rotorsList;
     }
 
     private static List<Character> readRotorsPositions() {
+        // Loading machine relevant settings
         int rotorCount = settings.getRotorsCount();
         Alphabet abc = settings.getAlphabet();
         List<Character> positions = new ArrayList<>();
-        System.out.println("Do you want to choose rotors positions? press Enter to continue or 'no' for default setup");
-        char choice = reader.next().charAt(0);
-        if (choice == 'n' || choice == 'N') {
-            return rotorsDefaultSetup();
-        }
-        System.out.println("Pick a letter in the alphabet for each rotor to set position, you can separate the letters by space or comas your choice :)");
+
+        System.out.println("\nStep 2: Choosing Rotors Positions\nFor each rotor pick a letter in the alphabet to set Rotor Position, if you want you can separate the letters by space,comas ");
         System.out.printf("Please input %d letters for %d rotors\n", rotorCount, rotorCount);
         int i = 0;
         do {
             for (char c : reader.nextLine().trim().toCharArray()) {
+                c = Character.toUpperCase(c);
                 if (i == rotorCount)
                     break;
                 if (abc.isLetter(c)) {
                     positions.add(c);
                     i++;
-                } else if (c != ',') {
+                } else if (c != ',' && !Character.isWhitespace(c)) {
                     System.out.print("letter " + c + " is not in alphabet!");
                 }
             }
@@ -445,22 +478,9 @@ public class EnigmaConsole {
     }
 
 
-    /**
-     * @return list of rotor positions all initialized to the first position meaning 1st letter in the alphabet
-     */
-    private static List<Character> rotorsDefaultSetup() {
-        char firstLetter = settings.getAlphabet().getLetter(0);
-        return Collections.nCopies(settings.getRotorsCount(), firstLetter);
-    }
-
 
     private static void pressEnterToContinue(){
         System.out.println("\n\n\tPress Enter to continue..");
         reader.nextLine();
-//        try{
-//            //System.in.read();
-//            reader.nextLine();
-//
-//        }catch(Exception e){}
     }
 }

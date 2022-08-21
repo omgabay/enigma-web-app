@@ -69,7 +69,7 @@ public class Rotor implements Serializable {
     public int getRotorPosition(){
         return this.rotorPosition;
     }
-    public void validateRotor() throws EnigmaException{
+    public void validateRotor(Alphabet abc) throws EnigmaException{
 
         // Check if notch is not out of bounds
         if(this.notch < 0 || this.notch >= rotorSize){
@@ -77,15 +77,45 @@ public class Rotor implements Serializable {
             throw new InvalidConfigurationException(msg);
         }
         // Check for rotor double mapping two inputs that map to the same exit
-       /* Set<Integer> rotorMappings = new HashSet<>(rotorSize);
-        for (int input = 0; input < this.rotorSize; input++) {
-            int delta = rotorMapToOutput.get(input);
-            int output = getRotorIndex(input+delta);
-            if(rotorMappings.contains(output)){
-                String msg = "Rotor #" + this.id + ": has double mapping to position " + output;
+
+        Set<Character> left = new HashSet<>();
+        Set<Character> right = new HashSet<>();
+        for (char letter :abc.getABC()) {
+            left.add(letter);
+            right.add(letter);
+        }
+        for (char letter : this.rightColumn) {
+            if(!abc.isLetter(letter)){
+                String msg = "Rotor #" + this.id + " Right column contains letter not in the alphabet (" + letter + ")";
+                throw new InvalidConfigurationException(msg);
             }
-            rotorMappings.add(output);
-        }*/
+            if(!right.contains(letter)){
+                String msg = "Rotor #" + this.id + ": Rotor Right Column has extra mapping for the same letter (" + letter +")";
+                throw new InvalidConfigurationException(msg);
+            }
+            right.remove(letter);
+        }
+        for (char letter : this.leftColumn) {
+            if(!abc.isLetter(letter)){
+                String msg = "Rotor #" + this.id + " Right column contains letter not in the alphabet (" + letter + ")";
+                throw new InvalidConfigurationException(msg);
+            }
+            if(!left.contains(letter)){
+                String msg = "Rotor #" + this.id + ": Rotor Left Column has extra mapping for the same letter (" + letter + ")";
+                throw new InvalidConfigurationException(msg);
+            }
+            left.remove(letter);
+        }
+        if(!right.isEmpty()){
+            char something = right.iterator().next();
+            String msg = "Rotor #" + this.id + "Right Column is missing mapping for letter " + something;
+            throw new InvalidConfigurationException(msg);
+        }
+        if(!left.isEmpty()){
+            char something = left.iterator().next();
+            String msg = "Rotor #" + this.id + "Left Column is missing mapping for letter " + something;
+            throw new InvalidConfigurationException(msg);
+        }
 
 
     }
@@ -141,11 +171,20 @@ public class Rotor implements Serializable {
         }
     }
 
+
+
     public char getRotorInitConfig(){
         return this.rotorInitConfig;
     }
 
     public char getCurrentPosition(){
         return this.rightColumn.get(0);
+    }
+
+    public int getDistanceFromNotch() {
+        if(this.notch >= this.rotorPosition) {
+            return this.notch - this.rotorPosition;
+        }
+        return (this.rotorSize-this.rotorPosition) + 1 + this.notch;
     }
 }

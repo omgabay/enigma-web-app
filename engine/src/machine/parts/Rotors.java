@@ -35,19 +35,19 @@ public class Rotors implements Serializable {
 
 
     public int forwardPass(char input, Alphabet abc){
-        StringBuilder sb = new StringBuilder();
-        sb.append(input);// FOR DEBUG
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(input);// FOR DEBUG
         this.rotateFirstRotor();
         int index = abc.getOrder(input);
         char output = input;
         for (Rotor r : rotors) {
-            sb.append("->"); // FOR DEBUG
+//            sb.append("->"); // FOR DEBUG
              index = r.getRightToLeftMapping(index);
              output = abc.getLetter(index);
-            sb.append(output);
+//            sb.append(output);
         }
-        sb.append('\n');
-        System.out.print(sb);
+//        sb.append('\n');
+//        System.out.print(sb);
         return abc.getOrder(output);
     }
 
@@ -66,18 +66,18 @@ public class Rotors implements Serializable {
     public int backwardPass(char input, Alphabet abc){
         int index = abc.getOrder(input);
         char output = input;
-        StringBuilder sb = new StringBuilder();
-        sb.append(input);// FOR DEBUG
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(input);// FOR DEBUG
         Iterator<Rotor> it = rotors.descendingIterator();
         while(it.hasNext()){
-            sb.append("->"); // FOR DEBUG
+//            sb.append("->"); // FOR DEBUG
             Rotor r = it.next();
             index = r.getLeftToRightMapping(index);
             output = abc.getLetter(index);
-            sb.append(output);
+//            sb.append(output);
         }
-        sb.append('\n');
-        System.out.print(sb);
+//        sb.append('\n');
+//        System.out.print(sb);
         return abc.getOrder(output);
     }
 
@@ -114,14 +114,8 @@ public class Rotors implements Serializable {
         }
         sb.append('>');
         it = rotors.descendingIterator();
-        first = true;
+        sb.append('<');
         while(it.hasNext()){
-            if(first){
-                sb.append('<');
-                first = false;
-            }else{
-                sb.append(',');
-            }
             sb.append(it.next().getRotorInitConfig());
         }
         sb.append('>');
@@ -140,5 +134,9 @@ public class Rotors implements Serializable {
             ids.add(it.next().getID());
         }
         return ids;
+    }
+
+    public Iterator<Rotor> getReversedIterator() {
+        return this.rotors.descendingIterator();
     }
 }

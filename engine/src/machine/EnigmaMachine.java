@@ -48,6 +48,7 @@ public class EnigmaMachine implements Enigma {
         }
         long finish = System.nanoTime();
         processed = encodedMsg.toString();
+        this.messageCount++;
         return new Message(text, processed, finish - start);
     }
 
@@ -56,15 +57,6 @@ public class EnigmaMachine implements Enigma {
         this.rotors.resetRotors();
     }
 
-    @Override
-    public void printMachine() {
-
-    }
-
-    @Override
-    public void printHistory() {
-
-    }
 
     @Override
     public List<Integer> getRotorIDs() {
@@ -116,12 +108,22 @@ public class EnigmaMachine implements Enigma {
     @Override
     public String getCurrentConfiguration() {
         StringBuilder sb = new StringBuilder();
-        String rotorIDs = rotors.getRotorIDs().toString();
-        rotorIDs = "<" + rotorIDs.substring(1, rotorIDs.length()) + ">";
-        sb.append(rotorIDs);
-        String rotorPositions = rotors.getCurrentPositions().toString();
-        rotorPositions = "<" + rotorPositions.substring(1, rotorPositions.length()) + ">";
-        sb.append(rotorPositions);
+        Iterator<Rotor> it = rotors.getReversedIterator();
+        sb.append('<').append(it.next().getID());
+        while(it.hasNext()){
+            sb.append(',');
+            sb.append(it.next().getID());
+        }
+        sb.append('>');
+        sb.append('<');
+        it = rotors.getReversedIterator();
+        while(it.hasNext()){
+            Rotor rotor = it.next();
+            sb.append(rotor.getCurrentPosition());
+            sb.append("(").append(rotor.getDistanceFromNotch()).append(")");
+        }
+        sb.append('>');
+
         sb.append(reflector.toString());
         sb.append(pb.toString());
         return sb.toString();

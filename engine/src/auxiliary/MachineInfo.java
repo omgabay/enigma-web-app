@@ -1,6 +1,5 @@
-package machine;
+package auxiliary;
 
-import auxiliary.RomanNumeral;
 import machine.parts.Plugboard;
 import machine.parts.Reflector;
 

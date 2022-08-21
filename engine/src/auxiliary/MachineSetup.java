@@ -1,6 +1,4 @@
 package auxiliary;
-import machine.Enigma;
-import machine.MachineInfo;
 import machine.parts.Plugboard;
 
 import java.util.List;
