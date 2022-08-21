@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Rotor implements Serializable {
     private final int id;
-    private int initialPosition;
+    private int rotorStartPosition;
     private int rotorPosition;
     private int notch;  // index of the notch
 
@@ -33,6 +33,7 @@ public class Rotor implements Serializable {
         this.rotorSize = abc.size();
         this.rotorPosition = 0;
         this.rotorInitConfig = abc.getLetter(0);
+        this.rotorStartPosition = 0;
         leftColumn = new ArrayList<>();
         rightColumn = new ArrayList<>();
         letterToRight = new HashMap<>();
@@ -108,24 +109,18 @@ public class Rotor implements Serializable {
         }
         if(!right.isEmpty()){
             char something = right.iterator().next();
-            String msg = "Rotor #" + this.id + "Right Column is missing mapping for letter " + something;
+            String msg = "Rotor #" + this.id + ": Right Column is missing mapping for letter " + something;
             throw new InvalidConfigurationException(msg);
         }
         if(!left.isEmpty()){
             char something = left.iterator().next();
-            String msg = "Rotor #" + this.id + "Left Column is missing mapping for letter " + something;
+            String msg = "Rotor #" + this.id + ": Left Column is missing mapping for letter " + something;
             throw new InvalidConfigurationException(msg);
         }
 
 
     }
-    private int getRotorIndex(int input){
-        int output = input % rotorSize;
-        if(output < 0){
-            output = this.rotorSize - input;
-        }
-        return output;
-    }
+
 
     /**
      * @param input The function gets the input letter and returns the index on the wheel where we exit
@@ -160,6 +155,7 @@ public class Rotor implements Serializable {
             rotorPosition %= rotorSize;
             curr = rightColumn.get(0);
         }
+        this.rotorStartPosition = rotorPosition;
     }
 
     public void setPosition(int position){
@@ -187,4 +183,18 @@ public class Rotor implements Serializable {
         }
         return (this.rotorSize-this.rotorPosition) + 1 + this.notch;
     }
+
+    public int getDistanceFromNotch(int position){
+        if(this.notch >= position) {
+            return this.notch - position;
+        }
+        return (this.rotorSize-position) + 1 + this.notch;
+    }
+
+
+    public String toString(){
+        return this.rotorInitConfig+"("+getDistanceFromNotch(rotorStartPosition)+")";
+    }
+
+
 }

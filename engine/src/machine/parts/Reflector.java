@@ -71,7 +71,7 @@ public class Reflector implements Serializable {
         }
         if(!keys.isEmpty()){
             int something = keys.iterator().next();
-            String msg = "Reflector " + this.idName + "is missing mapping to output -> " + something;
+            String msg = "Reflector " + this.idName + " is missing mapping to output -> " + something;
             throw new InvalidConfigurationException(msg);
         }
     }

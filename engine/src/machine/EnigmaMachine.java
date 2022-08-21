@@ -71,7 +71,7 @@ public class EnigmaMachine implements Enigma {
     @Override
     public List<Character> getRotorPositions() {
         List<Character> positions = new ArrayList<>();
-        Iterator<Rotor> it = rotors.getIterator();
+        Iterator<Rotor> it = rotors.getReversedIterator();
         while (it.hasNext()) {
             int position = it.next().getRotorPosition();
             positions.add(abc.getLetter(position));

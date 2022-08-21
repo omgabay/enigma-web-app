@@ -22,6 +22,8 @@ public interface MachineInfo {
 
 
     public int getMessageCount();
+    @Override
+    public String toString();
 
 
 }

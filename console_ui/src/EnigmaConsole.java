@@ -1,5 +1,6 @@
 import auxiliary.*;
 import auxiliary.MachineInfo;
+import exceptions.AbortSetupException;
 import exceptions.EnigmaException;
 
 import javax.xml.bind.JAXBException;
@@ -17,7 +18,11 @@ public class EnigmaConsole {
     public static void main(String[] args) {
         engine = new Engine();
 
-        System.out.println("\nWelcome to the Enigma Console by Omer Gabay :)");
+        System.out.println("\nWelcome to the Enigma Console by Omer Gabay :)\n\n");
+        System.out.println("\t\tGUIDELINES");
+        System.out.println("To start Enigma choose option 1 to load machine configuration file");
+        System.out.println("After enigma was loaded go to Setup - options 3 or 4");
+        System.out.println("You can also select option 8, to load previously created enigma from Backup file");
 
         boolean loop = true;
         char choice;
@@ -92,15 +97,17 @@ public class EnigmaConsole {
                 System.out.println("Please give the full path to Enigma backup file");
                 path = reader.next().trim();
                 try {
+                    File f = new File(path);
                     FileInputStream fileIn = new FileInputStream(path);
                     ObjectInputStream in = new ObjectInputStream(fileIn);
                     engine = (IEngine) in.readObject();
                     settings = (MachineSettings) engine.getEnigmaSettings().getData();
+                    System.out.println("Enigma Backup File " + f.getName() + " was loaded successfully");
                     in.close();
                     fileIn.close();
 
                 }catch(FileNotFoundException e){
-                    System.out.println("Enigma Backup File was not Found, Check Path");
+                    System.out.println("Enigma Backup File was not found, check your path");
                     return;
                 }
                 catch (ClassNotFoundException e) {
@@ -140,9 +147,6 @@ public class EnigmaConsole {
                     System.out.println("Serialization Error");
                 }
                 break;
-
-
-
             default:
                 System.out.println("I did not understand your choice, please select an option from the menu");
         }
@@ -181,7 +185,7 @@ public class EnigmaConsole {
         System.out.println("Your Enigma is using " + machine.getNumOfRotors() +"/" + engine.getNumOfRotors() + " rotors.");
         System.out.println("Number of Available Reflectors - " + engine.getNumOfReflectors());
         System.out.println("Your Enigma processed " + machine.getMessageCount() + " messages");
-        System.out.println("Enigma Initial Setup " + machine.toString());
+        System.out.println("Enigma Initial Setup " + machine);
         System.out.println("Enigma current configuration - " + machine.getCurrentConfiguration());
 
     }
@@ -203,13 +207,16 @@ public class EnigmaConsole {
             configFileName = xml.getName().substring(0,pos);
         }
         catch(FileNotFoundException e){
+            System.out.println("Loading operation failed");
             System.out.println("File '" + e.getMessage() + "' was not found, please check your path!");
         }catch (JAXBException e) {
-            e.printStackTrace();
+            System.out.println("Loading operation failed");
             System.out.println("XML parsing error. Please check that your xml is in the right format and close the file if it's open");
         }
         catch (EnigmaException e){
+            System.out.println("Loading operation failed");
             System.out.println(e.getMessage());
+
         }
     }
 
@@ -218,17 +225,11 @@ public class EnigmaConsole {
             System.out.println("Please load machine configuration file before setup phase");
             return;
         }
-        List<Integer> rotorIDs = readRotorsList();
-        List<Character> positions = readRotorsPositions();
-        RomanNumeral reflectorID = readReflectorChoice();
-        if(reflectorID == RomanNumeral.Undefined){
-            // Setup phase was stopped by the user
-            return;
-        }
-
-        HashMap<Character,Character> pb = readPlugboard();
-
         try {
+            List<Integer> rotorIDs = readRotorsList();
+            List<Character> positions = readRotorsPositions();
+            RomanNumeral reflectorID = readReflectorChoice();
+            HashMap<Character, Character> pb = readPlugboard2();
             System.out.println("Printing your choices");
             System.out.println("Rotors - " + rotorIDs);
             System.out.println("Rotors Positions - " + positions);
@@ -237,11 +238,73 @@ public class EnigmaConsole {
             Collections.reverse(rotorIDs);
             Collections.reverse(positions);
             engine.setupMachine(rotorIDs, positions, reflectorID, pb);
-        }catch(RuntimeException re){
+        }catch(AbortSetupException ase){
+            System.err.println("Enigma Setup was terminated by the user");
+        }
+        catch(RuntimeException re){
             System.out.print("Error in Setup - " + re.getMessage());
         }
     }
 
+    private static HashMap<Character, Character> readPlugboard2(){
+        HashMap<Character, Character> pb;
+        Alphabet abc = settings.getAlphabet();
+        System.out.println("\nStep 4 - Do you want to add plugs to plugboard?");
+
+        boolean waitingForInput = true;
+        boolean error = false;
+        do{
+            pb = new HashMap<>();
+            System.out.println("To add plugs input pairs of letters without spacing");
+            System.out.println("You can press Enter to skip this step.");
+            String input = reader.nextLine().trim().toUpperCase();
+            if(input.isEmpty()){
+                return pb;
+            }
+            if(input.length()%2 != 0){
+                char c = input.charAt(input.length()-1);
+                System.out.printf("Error - letter %c is missing another letter to plug with\ncheck that your input has even number of letters\n",c);
+                error = true;
+            }
+            for(int i=0; i<input.length()-1 && !error; i+=2){
+                char c1 = input.charAt(i);
+                char c2 = input.charAt(i+1);
+                if(!abc.isLetter(c1) || !abc.isLetter(c2)){
+                    System.out.println("Error - One of your letters is not in the alphabet (" + c1+c2+ ")");
+                    error = true;
+                    break;
+                }
+                if(pb.containsKey(c1)){
+                    System.out.println("Invalid input - " + c1 + " was already paired!");
+                    error = true;
+                    break;
+                }
+                if(pb.containsKey(c2)){
+                    System.out.println("Invalid input - " + c2 + " was already paired!");
+                    error = true;
+                    break;
+                }
+                pb.put(c1,c2);
+                pb.put(c2,c1);
+            }
+            if(error){
+                System.out.println("Do you want to try again? Pressing 'n' will exit the setup phase, any other key to try again");
+                char c = reader.nextLine().charAt(0);
+                if (Character.toLowerCase(c) == 'n') {
+                    throw new AbortSetupException();
+                }
+                error = false;
+            }else{
+                waitingForInput = false;
+            }
+
+        }while(waitingForInput);
+
+
+        return pb;
+
+    }
+    @Deprecated
     private static HashMap<Character, Character> readPlugboard() {
         HashMap<Character, Character> pb = new HashMap<>();
         Alphabet abc = settings.getAlphabet();
@@ -287,6 +350,7 @@ public class EnigmaConsole {
     }
 
     private static RomanNumeral readReflectorChoice() {
+        System.out.println("\nStep 3 - choosing reflector");
         RomanNumeral max = settings.getMaximalReflector();
         if (max == RomanNumeral.I) {
             System.out.println("Your Enigma uses Reflector " + RomanNumeral.I + " the only reflector available");
@@ -301,10 +365,10 @@ public class EnigmaConsole {
 
             String tmp = reader.nextLine().trim();
             char choice = Character.toLowerCase(tmp.charAt(0));
-            if (choice-'0' > max.getValue()) {
+            if (choice-'0' > max.getValue() || !Character.isDigit(choice)) {
                 choice = 0;
             }
-            System.out.println("Choice is "+ choice);
+
             switch (choice) {
                 case '1':
                     input = RomanNumeral.I;
@@ -326,7 +390,7 @@ public class EnigmaConsole {
                     System.out.println("Do you want to try again? Pressing 'n' will exit the setup phase, any other key to try again");
                     char c = reader.nextLine().charAt(0);
                     if (Character.toLowerCase(c) == 'n') {
-                        return RomanNumeral.Undefined;
+                        throw new AbortSetupException();
                     }
             }
         }while(input == RomanNumeral.Undefined);
@@ -371,7 +435,7 @@ public class EnigmaConsole {
         if(errMessage){
             System.err.println("Invalid Message! Your message contains letters not in the Alphabet");
             System.err.println("Message: " + text);
-            System.err.println("         " + sb.toString());
+            System.err.println("         " + sb);
             System.err.println("Machine Alphabet: " + abc);
             return;
         }
@@ -402,7 +466,7 @@ public class EnigmaConsole {
     }
 
     private static void printMenu(){
-        System.out.println("\n\t\t\tENIGMA MENU");
+        System.out.println("\n\t\tENIGMA MENU");
         System.out.println("1. Load machine configuration from XML file");
         System.out.println("2. Print machine specification - rotors, reflector, statistics");
         System.out.println("3. Choose Setup for machine");
@@ -421,33 +485,52 @@ public class EnigmaConsole {
         Set<Integer> rotors = new HashSet<>();
         List<Integer> rotorsList = new ArrayList<>();
 
-        System.out.println("Step 1: Please choose " + rotorCount +" rotors");
+        System.out.println("Step 1 - Please choose " + rotorCount +" rotors");
         System.out.println("rotors should be numbers in range 1-" + maximalRotor + "  (inclusive)");
-        System.out.println("You can separate the numbers with whitespace");
+        System.out.println("Separate the numbers with whitespace");
         int count = 0;
-        Scanner integers = new Scanner(System.in);
-        integers.useDelimiter("[^0-9]+");
+        String line = reader.nextLine();
+        Scanner s = new Scanner(line);
         while(count < rotorCount){
+            String input;
             try {
-                int id = integers.nextInt();
-                if(id < 1 || id > maximalRotor){
-                    System.out.printf("\nrotor %d is out of range\n", id);
-                    continue;
+                if(!s.hasNext()){
+                    System.out.printf("you need to choose %d more rotors\n", rotorCount-count);
+                    System.out.println("if you don't want to continue with setup press q");
+                    line = reader.nextLine();
+                    if(line.startsWith("q") || line.startsWith("Q")){
+                        throw new AbortSetupException();
+                    }
+                    s = new Scanner(line);
                 }
-                if(rotors.contains(id)){
-                    System.out.printf("rotor %d was already chosen!", id);
-                    continue;
-                }
-                rotors.add(id);
-                rotorsList.add(id);
-                count++;
-            }catch(InputMismatchException e){
-                System.out.println("please make sure to enter numbers");
-            }
-            catch (NoSuchElementException e){
+                input = s.next();
+            } catch (NoSuchElementException e){
                 System.out.printf("you need to choose %d more rotors\n", rotorCount-count);
+                continue;
+            }
+            for (String num : input.split(",")) {
+                if(count == rotorCount){
+                    break;
+                }
+                try {
+                    int id = Integer.parseInt(num);
+                    if (id < 1 || id > maximalRotor) {
+                        System.out.printf("\nrotor %d is out of range\n", id);
+                        continue;
+                    }
+                    if (rotors.contains(id)) {
+                        System.out.printf("rotor %d was already chosen!\n", id);
+                        continue;
+                    }
+                    rotors.add(id);
+                    rotorsList.add(id);
+                    count++;
+                }catch(NumberFormatException ne){
+                    System.out.println("Wrong input - rotor id should be a number\n");
+                }
             }
         }
+    System.out.println("Rotor IDs: " + rotorsList);
 
     return rotorsList;
     }
@@ -457,8 +540,10 @@ public class EnigmaConsole {
         int rotorCount = settings.getRotorsCount();
         Alphabet abc = settings.getAlphabet();
         List<Character> positions = new ArrayList<>();
+        int mistakes = 0;
 
-        System.out.println("\nStep 2: Choosing Rotors Positions\nFor each rotor pick a letter in the alphabet to set Rotor Position, if you want you can separate the letters by space,comas ");
+        System.out.println("\nStep 2 - Choosing Rotors Positions\nPick a letter in the alphabet for each rotor");
+        System.out.println("You can input the letters with or without spacing");
         System.out.printf("Please input %d letters for %d rotors\n", rotorCount, rotorCount);
         int i = 0;
         do {
@@ -470,10 +555,21 @@ public class EnigmaConsole {
                     positions.add(c);
                     i++;
                 } else if (c != ',' && !Character.isWhitespace(c)) {
-                    System.out.print("letter " + c + " is not in alphabet!");
+                    System.out.println("letter " + c + " is not in alphabet!");
+
+                    if(++mistakes >= 3){
+                        System.out.println("if you don't want to continue with setup press q");
+                        String input = reader.nextLine().trim();
+                        if(input.startsWith("q") || input.startsWith("Q")) {
+                            throw new AbortSetupException();
+                        }else{
+                            mistakes = 0;
+                        }
+                    }
                 }
             }
         } while (i < rotorCount);
+        System.out.println("Rotors Positions: " + positions);
         return positions;
     }
 

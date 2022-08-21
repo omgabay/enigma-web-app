@@ -24,7 +24,7 @@ public class Engine implements IEngine {
     private Enigma enigmaMachine;
     private boolean isLoaded;
     private boolean isMachinePresent;
-    private List<Integer> rotorsInitialConfig;
+
     private List<Rotor> rotorList;
     private List<Reflector> reflectorList;
 
@@ -80,7 +80,7 @@ public class Engine implements IEngine {
             rotorList.add(new Rotor(rotor, this.alphabet));
         }
         if(rotorsCount < 2 || rotorsCount > 99 || rotorsCount > rotorList.size()){
-            String msg = "Invalid configuration, rotors-count has to be at least 2 and no bigger than the available rotors.";
+            String msg = "Invalid configuration, rotors-count has to be at least 2 and no more than the available rotors.";
             throw new InvalidConfigurationException(msg);
         }
         // Sorting rotorList by ID
@@ -101,7 +101,7 @@ public class Engine implements IEngine {
     @Override
     public EngineResponse<MachineInfo> displayMachine() {
 
-        return new EngineResponse<>((MachineInfo) enigmaMachine, true);
+        return new EngineResponse<>(enigmaMachine, true);
     }
 
 
@@ -126,7 +126,7 @@ public class Engine implements IEngine {
     }
 
     @Override
-    public EngineResponse<MachineSetup> setupMachineAtRandom() {
+    public EngineResponse<MachineInfo> setupMachineAtRandom() {
         Random r = new Random();
         Set<Integer> rotors = new HashSet<>();
         List<Rotor> machineRotors = new ArrayList<>();
@@ -142,7 +142,7 @@ public class Engine implements IEngine {
         // Set Rotors at Random Position
         for(Rotor rotor : machineRotors){
             int pos = r.nextInt(this.alphabet.size());
-            rotor.setPosition(pos);
+            rotor.setInitialPosition(alphabet.getLetter(pos));
         }
 
         // Pick Reflector at Random
@@ -167,8 +167,7 @@ public class Engine implements IEngine {
         }
         this.currentHistory = new History(enigmaMachine.toString());
         this.isMachinePresent = true;
-        MachineSetup ms = new MachineSetup((MachineInfo)enigmaMachine);
-        return new EngineResponse<>(ms,true);
+        return new EngineResponse<>(enigmaMachine,true);
     }
 
     @Override

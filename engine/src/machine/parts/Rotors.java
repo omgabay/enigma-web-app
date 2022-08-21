@@ -116,7 +116,7 @@ public class Rotors implements Serializable {
         it = rotors.descendingIterator();
         sb.append('<');
         while(it.hasNext()){
-            sb.append(it.next().getRotorInitConfig());
+            sb.append(it.next().toString());
         }
         sb.append('>');
         return sb.toString();

@@ -3,9 +3,9 @@ package auxiliary;
 import java.io.Serializable;
 
 public class Message implements Serializable {
-    private String originalMsg;
-    private String processedMsg;
-    private long timeProcessed;
+    private final String originalMsg;
+    private final String processedMsg;
+    private final long timeProcessed;
 
 
     public Message(String original, String processed , long time){
