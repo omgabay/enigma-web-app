@@ -2,9 +2,8 @@ package machine.parts;
 import auxiliary.Alphabet;
 import auxiliary.RomanNumeral;
 import exceptions.InvalidConfigurationException;
-import generated.CTEReflect;
-import generated.CTEReflector;
-
+import jaxb.generated.CTEReflect;
+import jaxb.generated.CTEReflector;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="okio-2.8.0">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Downloads/okHttp/okHttp" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$USER_HOME$/Downloads/okHttp/okHttp" recursive="false" />
+  </library>
+</component>

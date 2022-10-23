@@ -14,6 +14,7 @@ public interface MachineInfo {
 
     public Reflector getReflector();
 
+
     public int getNumOfRotors();
 
 

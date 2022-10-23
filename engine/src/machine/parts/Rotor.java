@@ -2,38 +2,73 @@ package machine.parts;
 import auxiliary.Alphabet;
 import exceptions.EnigmaException;
 import exceptions.InvalidConfigurationException;
-import generated.CTEPositioning;
-import generated.CTERotor;
+import jaxb.generated.CTEPositioning;
+import jaxb.generated.CTERotor;
+
 import java.io.Serializable;
 import java.util.*;
 
-public class Rotor implements Serializable {
+public class Rotor implements Serializable , Iterator<Boolean> {
     private final int id;
-    private int rotorStartPosition;
     private int rotorPosition;
-    private int notch;  // index of the notch
+    private final int notch;
 
     private final int rotorSize;
-    private ArrayList<Integer> rotorMapToOutput;
-    private ArrayList<Integer> rotorMapToInput;
+    private final ArrayList<Character> rightColumn;
+    private final ArrayList<Character> leftColumn;
 
-    private char rotorInitConfig;
-    private ArrayList<Character> rightColumn;
-    private ArrayList<Character> leftColumn;
+    private final Map<Character,Integer> letterToRight;
+    private final Map<Character, Integer> letterToLeft;
 
-    private Map<Character,Integer> letterToRight;
-    private Map<Character, Integer> letterToLeft;
-
-
+// Rotor Initial Setup Variables
+    private char startPositionCharacter;
+    private final int startPositionIndex;
 
 
+
+
+    // Copy constructor for rotor
+    public Rotor(Rotor rotor){
+        this.id = rotor.id;
+        this.notch = rotor.notch;
+        this.rotorSize = rotor.rotorSize;
+
+
+        this.rotorPosition = rotor.rotorPosition;
+
+        //Copying positions
+        this.startPositionCharacter = rotor.startPositionCharacter;
+        this.startPositionIndex = rotor.startPositionIndex;
+
+
+
+        // Copying left column
+        this.leftColumn  = new ArrayList<>();
+        for (char c : rotor.leftColumn) {
+            this.leftColumn.add(c);
+        }
+
+        // Copying right column
+        this.rightColumn = new ArrayList<>();
+        for(char c : rotor.rightColumn){
+            this.rightColumn.add(c);
+        }
+
+        // Copying map
+        this.letterToLeft = new HashMap<>(rotor.letterToLeft);
+        this.letterToRight = new HashMap<>(rotor.letterToRight);
+
+    }
     public Rotor(CTERotor cteRotor, Alphabet abc) {
         this.notch = cteRotor.getNotch() - 1;
         this.id = cteRotor.getId();
         this.rotorSize = abc.size();
-        this.rotorPosition = 0;
-        this.rotorInitConfig = abc.getLetter(0);
-        this.rotorStartPosition = 0;
+
+        // Task 2 - JavaFX Rotor Position changed to SimpleIntegerProperty
+        this.rotorPosition= 0;
+
+        this.startPositionCharacter = abc.getLetter(0);
+        this.startPositionIndex = 0;
         leftColumn = new ArrayList<>();
         rightColumn = new ArrayList<>();
         letterToRight = new HashMap<>();
@@ -49,27 +84,31 @@ public class Rotor implements Serializable {
         for (char letter : leftColumn) {
             letterToRight.put(letter, rightColumn.indexOf(letter));
             letterToLeft.put(letter, leftColumn.indexOf(letter));
-
         }
+
     }
 
 
 
     public boolean Rotate(){
-        rotorPosition++;
-        rotorPosition %= rotorSize;
+        int position = rotorPosition;
+        position++;
+        position %= rotorSize;
+
+        // Updating Rotor Position Property  - Update Task 2 JavaFX
+        rotorPosition = position;
+
+        // Changing the rotor mapping columns
         leftColumn.add(leftColumn.remove(0));
         rightColumn.add(rightColumn.remove(0));
-        return rotorPosition == this.notch;
+        return position == this.notch;
     }
 
 
     public int getID(){
         return this.id;
     }
-    public int getRotorPosition(){
-        return this.rotorPosition;
-    }
+
     public void validateRotor(Alphabet abc) throws EnigmaException{
 
         // Check if notch is not out of bounds
@@ -124,7 +163,7 @@ public class Rotor implements Serializable {
 
     /**
      * @param input The function gets the input letter and returns the index on the wheel where we exit
-     * @return
+     * @return index of the new output signal after passing through the rotor
      */
     public int getLeftToRightMapping(int input){
         char letter = leftColumn.get(input);
@@ -146,42 +185,26 @@ public class Rotor implements Serializable {
 
 
     public void setInitialPosition(char position) {
-        this.rotorInitConfig = position;
-        char curr = rightColumn.get(0);
-        while(curr != position){
-            leftColumn.add(leftColumn.remove(0));
-            rightColumn.add(rightColumn.remove(0));
-            rotorPosition++;
-            rotorPosition %= rotorSize;
-            curr = rightColumn.get(0);
-        }
-        this.rotorStartPosition = rotorPosition;
+        this.startPositionCharacter = position;
     }
 
     public void setPosition(int position){
-        while(position != rotorPosition){
+        while(this.rotorPosition != position){
             leftColumn.add(leftColumn.remove(0));
             rightColumn.add(rightColumn.remove(0));
-            rotorPosition++;
-            rotorPosition %= rotorSize;
+            this.rotorPosition++;
+            this.rotorPosition %= rotorSize;
         }
     }
 
 
-
-    public char getRotorInitConfig(){
-        return this.rotorInitConfig;
-    }
-
-    public char getCurrentPosition(){
-        return this.rightColumn.get(0);
-    }
 
     public int getDistanceFromNotch() {
-        if(this.notch >= this.rotorPosition) {
-            return this.notch - this.rotorPosition;
+        int position = rotorPosition;
+        if(this.notch >= position) {
+            return this.notch - position;
         }
-        return (this.rotorSize-this.rotorPosition) + 1 + this.notch;
+        return (this.rotorSize - position) + 1 + this.notch;
     }
 
     public int getDistanceFromNotch(int position){
@@ -193,8 +216,24 @@ public class Rotor implements Serializable {
 
 
     public String toString(){
-        return this.rotorInitConfig+"("+getDistanceFromNotch(rotorStartPosition)+")";
+        return this.startPositionCharacter +"("+getDistanceFromNotch(startPositionIndex)+")";
     }
 
 
+
+    @Override
+    public boolean hasNext() {
+        int position = rotorPosition;
+        return position != this.rotorSize -1;
+    }
+
+    @Override
+    public Boolean next() {
+        Rotate();
+        return this.rotorPosition == 0;
+    }
+
+    public int getRotorPosition() {
+        return this.rotorPosition;
+    }
 }

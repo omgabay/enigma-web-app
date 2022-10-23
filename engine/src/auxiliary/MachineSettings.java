@@ -1,16 +1,16 @@
 package auxiliary;
 
 public class MachineSettings{
-    private int numOfRotors;
-    private int rotorsCount;
-    private int numOfReflectors;
+    private final int numOfRotors;
+    private final int rotorsCount;
+    private final int numberOfReflectors;
     private final Alphabet abc;
 
 
     public MachineSettings(int rotorsCount, int nRotors, int nReflectors, Alphabet alphabet){
         this.rotorsCount = rotorsCount;
         numOfRotors = nRotors;
-        numOfReflectors = nReflectors;
+        numberOfReflectors = nReflectors;
         abc = alphabet;
     }
     public int getNumOfRotors(){
@@ -21,7 +21,11 @@ public class MachineSettings{
         return rotorsCount;
     }
 
+    public int getNumberOfReflectors(){
+        return this.numberOfReflectors;
+    }
+
     public Alphabet getAlphabet() {return abc;}
 
-    public RomanNumeral getMaximalReflector(){return RomanNumeral.getRomanFromInt(numOfReflectors);}
+    public RomanNumeral getMaximalReflector(){return RomanNumeral.getRomanFromInt(numberOfReflectors);}
 }

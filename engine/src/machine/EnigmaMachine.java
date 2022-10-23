@@ -13,8 +13,8 @@ public class EnigmaMachine implements Enigma {
 
     private final Alphabet abc;
     private final Plugboard pb;
-    private final Rotors rotors;
-    private final Reflector reflector;
+    private  Rotors rotors;
+    private Reflector reflector;
 
     private int messageCount;
 
@@ -25,6 +25,20 @@ public class EnigmaMachine implements Enigma {
         this.pb = plugs;
         this.reflector = r;
         this.messageCount = 0;
+    }
+
+    /**
+     * @param machine Enigma Machine Copy constructor - creating new machine from the given one
+     */
+    public EnigmaMachine(EnigmaMachine machine) {
+        // Copying Rotors
+        this.rotors = new Rotors(machine.rotors);
+
+        // shallow copy for reflector,plugboard and alphabet
+        this.reflector = machine.reflector;
+        this.pb = machine.pb;
+        this.abc = machine.abc;
+        this.messageCount = machine.messageCount;
     }
 
 
@@ -57,35 +71,59 @@ public class EnigmaMachine implements Enigma {
         this.rotors.resetRotors();
     }
 
+    @Override
+
+    // DELETE - FOR TESTING
+    public Iterator<List<Integer>> getRotorsIterator() {
+        return this.rotors;
+    }
+
+    @Override
+    public List<Integer> getPositionsIndices() {
+        return this.rotors.getPositionsIndices();
+    }
+
+    @Override
+    public List<Integer> setRotorPositions(List<Integer> positions) {
+        this.rotors.setRotorPositions(positions);
+        return positions;
+    }
+
+    @Override
+    public void swapReflector(Reflector rafi) {
+        this.reflector = rafi;
+    }
+
+    @Override
+    public Alphabet getAlphabet() {
+        return this.abc;
+    }
+
+    @Override
+    public void setRotors(Rotors newRotors) {
+        this.rotors = newRotors;
+    }
+
 
     @Override
     public List<Integer> getRotorIDs() {
-        List<Integer> ids = new ArrayList<>();
-        Iterator<Rotor> it = rotors.getIterator();
-        while (it.hasNext()) {
-            ids.add(it.next().getID());
-        }
-        return ids;
+        return rotors.getRotorIDs();
     }
 
     @Override
     public List<Character> getRotorPositions() {
         List<Character> positions = new ArrayList<>();
-        Iterator<Rotor> it = rotors.getReversedIterator();
-        while (it.hasNext()) {
-            int position = it.next().getRotorPosition();
+        for(int position : rotors.getPositionsIndices()){
             positions.add(abc.getLetter(position));
         }
+
 
         return positions;
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(rotors.toString());
-        sb.append(reflector.toString());
-        sb.append(pb.toString());
-        return sb.toString();
+        // Prints the Machine Initial Setup in String format
+        return rotors.toString() + reflector.toString() + pb.toString();
     }
 
 
@@ -93,6 +131,8 @@ public class EnigmaMachine implements Enigma {
     public Reflector getReflector() {
         return new Reflector(this.reflector);
     }
+
+
 
     @Override
     public int getNumOfRotors() {
@@ -108,21 +148,26 @@ public class EnigmaMachine implements Enigma {
     @Override
     public String getCurrentConfiguration() {
         StringBuilder sb = new StringBuilder();
-        Iterator<Rotor> it = rotors.getReversedIterator();
-        sb.append('<').append(it.next().getID());
-        while(it.hasNext()){
-            sb.append(',');
-            sb.append(it.next().getID());
+        List<Integer> rotorIds = rotors.getRotorIDs();
+
+        for(int i=0; i<rotorIds.size(); i++){
+            if(i==0){
+                sb.append("<").append(rotorIds.get(i));
+            }else{
+                sb.append(",").append(rotorIds.get(i));
+            }
         }
+
         sb.append('>');
+
+
+        Iterator<Integer> positions = rotors.getPositionsIndices().iterator();
         sb.append('<');
-        it = rotors.getReversedIterator();
-        while(it.hasNext()){
-            Rotor rotor = it.next();
-            sb.append(rotor.getCurrentPosition());
-            sb.append("(").append(rotor.getDistanceFromNotch()).append(")");
+        while(positions.hasNext()) {
+            sb.append(abc.getLetter(positions.next()));
         }
         sb.append('>');
+
 
         sb.append(reflector.toString());
         sb.append(pb.toString());

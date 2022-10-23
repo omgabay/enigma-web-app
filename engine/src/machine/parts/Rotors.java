@@ -5,54 +5,59 @@ import auxiliary.Alphabet;
 import java.io.Serializable;
 import java.util.*;
 
-public class Rotors implements Serializable {
+public class Rotors implements Serializable , Iterator<List<Integer>> {
 
-    private LinkedList<Rotor> rotors;
-    private List<Integer> initialConfig;
+    private final LinkedList<Rotor> rotorList;
+    private final List<Integer> initialConfiguration;
 
 
 
     public Rotors(List<Rotor> rotorsList) {
-        initialConfig = new ArrayList<>();
-        rotors = new LinkedList<>();
-        rotors.addAll(rotorsList);
 
-        for(Rotor r: rotors) {
-            initialConfig.add(r.getRotorPosition());
+        rotorList = new LinkedList<>(rotorsList);
+
+        initialConfiguration = new ArrayList<>();
+        for(Rotor r: rotorList) {
+            initialConfiguration.add(r.getRotorPosition());
+        }
+    }
+
+    public Rotors(Rotors rotors) {
+        // DEEP Copy for Rotors
+        this.rotorList = new LinkedList<>();
+        for (Rotor r : rotors.rotorList) {
+            rotorList.add(new Rotor(r));
         }
 
+        this.initialConfiguration = new ArrayList<>();
+        for(Rotor r: this.rotorList) {
+            initialConfiguration.add(r.getRotorPosition());
+        }
     }
 
     public void resetRotors(){
-        Iterator<Integer> it = this.initialConfig.iterator();
-        for (Rotor r: this.rotors) {
+        Iterator<Integer> it = this.initialConfiguration.iterator();
+        for (Rotor r: this.rotorList) {
             r.setPosition(it.next());
         }
     }
 
 
 
-
-
     public int forwardPass(char input, Alphabet abc){
-//        StringBuilder sb = new StringBuilder();
-//        sb.append(input);// FOR DEBUG
         this.rotateFirstRotor();
         int index = abc.getOrder(input);
         char output = input;
-        for (Rotor r : rotors) {
-//            sb.append("->"); // FOR DEBUG
+        for (Rotor r : rotorList) {
+
              index = r.getRightToLeftMapping(index);
              output = abc.getLetter(index);
-//            sb.append(output);
         }
-//        sb.append('\n');
-//        System.out.print(sb);
         return abc.getOrder(output);
     }
 
     private void rotateFirstRotor() {
-        Iterator<Rotor> it = this.rotors.iterator();
+        Iterator<Rotor> it = this.rotorList.iterator();
         boolean keepRotate;
         do{
             keepRotate = it.next().Rotate();
@@ -64,35 +69,86 @@ public class Rotors implements Serializable {
      * @return output signal after passing the rotors on the way back - reflector > rotors > plugboard > output
      */
     public int backwardPass(char input, Alphabet abc){
+
+
         int index = abc.getOrder(input);
         char output = input;
-//        StringBuilder sb = new StringBuilder();
-//        sb.append(input);// FOR DEBUG
-        Iterator<Rotor> it = rotors.descendingIterator();
+        Iterator<Rotor> it = rotorList.descendingIterator();
+
         while(it.hasNext()){
-//            sb.append("->"); // FOR DEBUG
+
             Rotor r = it.next();
             index = r.getLeftToRightMapping(index);
             output = abc.getLetter(index);
-//            sb.append(output);
         }
-//        sb.append('\n');
-//        System.out.print(sb);
         return abc.getOrder(output);
     }
 
-    public Iterator<Rotor> getIterator(){
-        return rotors.iterator();
+
+
+
+    public List<Integer> getPositionsIndices(){
+        List<Integer> positions = new ArrayList<>();
+        Iterator<Rotor> it = rotorList.iterator();
+
+        while(it.hasNext()){
+            positions.add(it.next().getRotorPosition());
+        }
+
+        return positions;
     }
 
-    public List<Character> getCurrentPositions(){
-        List<Character> res = new ArrayList<>();
-        Iterator<Rotor> it = rotors.descendingIterator();
+    public void setRotorPositions(List<Integer> positions) {
+        Iterator<Rotor> it = this.rotorList.iterator();
+        Iterator<Integer> newPositions = positions.iterator();
         while(it.hasNext()){
-            res.add(it.next().getCurrentPosition());
+            it.next().setPosition(newPositions.next());
         }
-        return res;
+
     }
+
+
+    public int size() {
+        return this.rotorList.size();
+    }
+
+    public List<Integer> getRotorIDs(){
+        Iterator<Rotor> it = this.rotorList.iterator();
+        List<Integer> ids = new ArrayList<>();
+        while(it.hasNext()){
+            ids.add(it.next().getID());
+        }
+        return ids;
+    }
+
+
+
+
+    // Iterator related
+    public Iterator<Rotor> getIterator() {
+        return this.rotorList.iterator();
+    }
+
+
+    // Iterator functions
+    @Override
+    public boolean hasNext() {
+        return true;
+    }
+
+    @Override
+    public List<Integer> next() {
+        Iterator<Rotor> it = this.rotorList.iterator();
+        Rotor rotor = it.next();
+        boolean flag = true;
+        while(it.hasNext() && flag){
+            flag = rotor.next(); // keep rotating
+            rotor = it.next(); // getting next rotor
+        }
+        return this.getPositionsIndices();
+    }
+
+
 
 
     public String toString(){
@@ -101,7 +157,7 @@ public class Rotors implements Serializable {
 
         // Printing Rotor Initial Setup -
 
-        Iterator<Rotor> it  = rotors.descendingIterator();
+        Iterator<Rotor> it  = rotorList.iterator();
         boolean first = true;
         while(it.hasNext()){
             if(first){
@@ -113,7 +169,7 @@ public class Rotors implements Serializable {
             sb.append(it.next().getID());
         }
         sb.append('>');
-        it = rotors.descendingIterator();
+        it = rotorList.iterator();
         sb.append('<');
         while(it.hasNext()){
             sb.append(it.next().toString());
@@ -123,20 +179,4 @@ public class Rotors implements Serializable {
     }
 
 
-    public int size() {
-        return this.rotors.size();
-    }
-
-    public List<Integer> getRotorIDs(){
-        Iterator<Rotor> it = this.rotors.descendingIterator();
-        List<Integer> ids = new ArrayList<>();
-        while(it.hasNext()){
-            ids.add(it.next().getID());
-        }
-        return ids;
-    }
-
-    public Iterator<Rotor> getReversedIterator() {
-        return this.rotors.descendingIterator();
-    }
 }
