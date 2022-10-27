@@ -28,9 +28,59 @@
         <servlet-name>UploadEnigmaFile</servlet-name>
         <url-pattern>/upload-enigma-file</url-pattern>
     </servlet-mapping>
-    
 
-    
+
+    <servlet>
+        <servlet-name>GetTeam</servlet-name>
+        <servlet-class>servlets.allies.GetAllTeamsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetTeam</servlet-name>
+        <url-pattern>/teams</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>WinnerDeclaration</servlet-name>
+        <servlet-class>servlets.uboat.DeclareWinnerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WinnerDeclaration</servlet-name>
+        <url-pattern>/winner</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>FetchNewTasks</servlet-name>
+        <servlet-class>servlets.allies.FetchNewTasksServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FetchNewTasks</servlet-name>
+        <url-pattern>/fetch-tasks</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>StartGame</servlet-name>
+        <servlet-class>servlets.uboat.StartGameServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StartGame</servlet-name>
+        <url-pattern>/game/start</url-pattern>
+    </servlet-mapping>
+
+
+
+
+    <servlet>
+        <servlet-name>GetTeamServlet</servlet-name>
+        <servlet-class>servlets.allies.GetTeamServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetTeamServlet</servlet-name>
+        <url-pattern>/team</url-pattern>
+    </servlet-mapping>
+
+
 
 
 </web-app>

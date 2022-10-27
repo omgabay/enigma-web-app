@@ -2,7 +2,7 @@ package servlets;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import users.UserManager;
+import users.*;
 import utils.Constants;
 import utils.servlet.ServletUtils;
 import utils.servlet.SessionUtils;
@@ -10,11 +10,13 @@ import jakarta.servlet.http.HttpServlet;
 
 import java.io.IOException;
 
-import static utils.Constants.CLIENT_TYPE;
-import static utils.Constants.USERNAME;
+import static utils.Constants.*;
 
 
 public class LoginServlet extends HttpServlet {
+
+
+
 
 
 
@@ -33,23 +35,13 @@ public class LoginServlet extends HttpServlet {
                 //no username in session and no username in parameter - not standard situation. it's a conflict
 
                 // stands for conflict in server state
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
             } else {
                 //normalize the username value
                 usernameFromParameter = usernameFromParameter.trim();
 
-                /*
-                One can ask why not enclose all the synchronizations inside the userManager object ?
-                Well, the atomic action we need to perform here includes both the question (isUserExists) and (potentially) the insertion
-                of a new user (addUser). These two actions needs to be considered atomic, and synchronizing only each one of them, solely, is not enough.
-                (of course there are other more sophisticated and performable means for that (atomic objects etc) but these are not in our scope)
 
-                The synchronized is on this instance (the servlet).
-                As the servlet is singleton - it is promised that all threads will be synchronized on the very same instance (crucial here)
-
-                A better code would be to perform only as little and as necessary things we need here inside the synchronized block and avoid
-                do here other not related actions (such as response setup. this is shown here in that manner just to stress this issue
-                 */
                 synchronized (this) {
                     if (userManager.isUserExists(usernameFromParameter)) {
                         String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
@@ -59,14 +51,17 @@ public class LoginServlet extends HttpServlet {
                         response.getOutputStream().print(errorMessage);
                     }
                     else {
-                        userManager.addUser(usernameFromParameter);
+                        User user = createUserObject(request, usernameFromParameter, clientType);
+                        userManager.addUser(usernameFromParameter, user);
                         request.getSession(true).setAttribute(USERNAME, usernameFromParameter);
 
                         //redirect the request to the chat room - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());
 
                         // Writing back to the client the name that was added
-                        response.getWriter().print(Constants.GSON_INSTANCE.toJson(usernameFromParameter));
+
+                        //response.getWriter().print(Constants.GSON_INSTANCE.toJson(usernameFromParameter));
+                        response.getWriter().print(Constants.GSON_INSTANCE.toJson(user));
                         response.setStatus(HttpServletResponse.SC_OK);
                     }
                 }
@@ -76,4 +71,28 @@ public class LoginServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
         }
     }
+
+    private User createUserObject(HttpServletRequest request ,String username,  String type) {
+        User user = null;
+        switch(type) {
+            case "uboat":
+                user = new UBoat(username);
+                break;
+            case "ally":
+                user = new AllyTeam(username);
+                break;
+            case "agent":
+                String team = request.getParameter(TEAM_NAME_PARAM);
+                int workers = Integer.parseInt(request.getParameter(AGENT_WORKER_COUNT));
+                long taskSize = Long.parseLong(request.getParameter(AGENT_TASK_SIZE));
+                user = new AgentEntry(username, team, taskSize, workers);
+                break;
+        }
+        return user;
+    }
+
+
+
+
+
 }

@@ -19,5 +19,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="engine" />
+    <orderEntry type="module" module-name="web-app" />
   </component>
 </module>

@@ -7,9 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import utils.http.HttpClientUtil;
-
 import java.io.IOException;
-
 import static utils.Configuration.LOGIN_PAGE_FXML_RESOURCE_LOCATION;
 
 public class UBoatClient extends Application {

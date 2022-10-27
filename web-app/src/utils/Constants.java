@@ -3,6 +3,8 @@ package utils;
 //import com.google.gson.Gson;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import users.UBoat;
 
 public class Constants {
 
@@ -21,12 +23,30 @@ public class Constants {
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/login";
     public final static String USERS_LIST = FULL_SERVER_PATH + "/userslist";
     public final static String LOGOUT = FULL_SERVER_PATH + "/logout";
+    public static final String TEAMS_LIST_RESOURCE = FULL_SERVER_PATH +  "/teams";
+
+    public static final String UBOAT_LIST_RESOURCE = FULL_SERVER_PATH + "/uboats";
+
+    public static final String AGENT_LIST_RESOURCE = FULL_SERVER_PATH + "/agents";
 
 
 
+
+
+
+    // Parameters
     public static final String USERNAME = "username";
     public static final String USER_NAME_ERROR = "username_error";
     public static final String CLIENT_TYPE = "type";
+    public static final String TEAM_NAME_PARAM = "team";
+    public static final String TASK_SIZE = "taskSize";
+
+    public static final String AGENT_WORKER_COUNT = "workers";
+
+    public static final String AGENT_TASK_SIZE = "taskSize";
+
+
+
 
 
 

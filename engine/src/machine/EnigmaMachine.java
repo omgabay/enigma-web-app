@@ -11,7 +11,7 @@ import java.util.List;
 
 public class EnigmaMachine implements Enigma {
 
-    private final Alphabet abc;
+    private final Alphabet alphabet;
     private final Plugboard pb;
     private  Rotors rotors;
     private Reflector reflector;
@@ -20,7 +20,7 @@ public class EnigmaMachine implements Enigma {
 
 
     public EnigmaMachine(List<Rotor> rotors, Reflector r, Plugboard plugs, Alphabet alphabet) {
-        this.abc = alphabet;
+        this.alphabet = alphabet;
         this.rotors = new Rotors(rotors);
         this.pb = plugs;
         this.reflector = r;
@@ -37,7 +37,7 @@ public class EnigmaMachine implements Enigma {
         // shallow copy for reflector,plugboard and alphabet
         this.reflector = machine.reflector;
         this.pb = machine.pb;
-        this.abc = machine.abc;
+        this.alphabet = machine.alphabet;
         this.messageCount = machine.messageCount;
     }
 
@@ -50,13 +50,13 @@ public class EnigmaMachine implements Enigma {
         long start = System.nanoTime();
         for (char letter : text.toCharArray()) {
             letter = pb.plugboardConverter(letter);  // check in plugboard and swap letter if necessary
-            int signal = rotors.forwardPass(letter, abc);
+            int signal = rotors.forwardPass(letter, alphabet);
             //System.out.print("reflector:"+ abc.getLetter(signal) + "->");
             signal = reflector.getReflection(signal);
             //System.out.println(abc.getLetter(signal));
-            letter = abc.getLetter(signal);
-            int output = rotors.backwardPass(letter, abc);
-            char outputLetter = abc.getLetter(output);
+            letter = alphabet.getLetter(signal);
+            int output = rotors.backwardPass(letter, alphabet);
+            char outputLetter = alphabet.getLetter(output);
             encoded = pb.plugboardConverter(outputLetter);
             encodedMsg.append(encoded);
         }
@@ -96,7 +96,7 @@ public class EnigmaMachine implements Enigma {
 
     @Override
     public Alphabet getAlphabet() {
-        return this.abc;
+        return this.alphabet;
     }
 
     @Override
@@ -114,7 +114,7 @@ public class EnigmaMachine implements Enigma {
     public List<Character> getRotorPositions() {
         List<Character> positions = new ArrayList<>();
         for(int position : rotors.getPositionsIndices()){
-            positions.add(abc.getLetter(position));
+            positions.add(alphabet.getLetter(position));
         }
 
 
@@ -164,7 +164,7 @@ public class EnigmaMachine implements Enigma {
         Iterator<Integer> positions = rotors.getPositionsIndices().iterator();
         sb.append('<');
         while(positions.hasNext()) {
-            sb.append(abc.getLetter(positions.next()));
+            sb.append(alphabet.getLetter(positions.next()));
         }
         sb.append('>');
 

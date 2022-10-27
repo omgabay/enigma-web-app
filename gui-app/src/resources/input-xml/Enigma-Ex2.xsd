@@ -51,8 +51,8 @@
 	</xs:element>
 	<xs:element name="CTE-Positioning">
 		<xs:complexType>
-			<xs:attribute name="left" type="xs:string" use="required"/>
 			<xs:attribute name="right" type="xs:string" use="required"/>
+			<xs:attribute name="left" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="CTE-Machine">
@@ -69,7 +69,24 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="CTE-Machine"/>
+				<xs:element ref="CTE-Decipher"/>
 			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CTE-Dictionary">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Words" type="xs:string"/>
+			</xs:sequence>
+			<xs:attribute name="exclude-chars" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CTE-Decipher">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CTE-Dictionary"/>
+			</xs:sequence>
+			<xs:attribute name="agents" type="xs:int" use="required"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

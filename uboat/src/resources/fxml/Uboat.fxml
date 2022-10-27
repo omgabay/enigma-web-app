@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="825.0" prefWidth="1095.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.UBoatController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="825.0" prefWidth="1095.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <Label fx:id="nameLabel" text="Uboat" BorderPane.alignment="CENTER">
          <font>
@@ -71,14 +71,14 @@
                                     <Label text="Number of Machine Rotors:" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
                                     <Label alignment="CENTER" contentDisplay="CENTER" text="Total Number of Reflectors:" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
                                     <Label text="Machine Alphabet:" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-                                    <Label fx:id="rotorCountLabel" text="5" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                                    <Label fx:id="machineRotorCountLabel" text="3" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-                                    <Label fx:id="reflectorCountLabel" text="3" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
-                                    <Label fx:id="alphabetLabel" text="ABCDEF" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
+                                    <Label fx:id="rotorCountLabel" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                    <Label fx:id="machineRotorCountLabel" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                                    <Label fx:id="reflectorCountLabel" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                                    <Label fx:id="alphabetLabel" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
                                     <Label text="Battlefield Name:" GridPane.halignment="CENTER" />
-                                    <Label fx:id="battlefieldLabel" text="WWII" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                    <Label fx:id="battlefieldLabel" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                                     <Label text="Contest Difficulty:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                    <Label fx:id="difficultyLabel" text="Easy" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                    <Label fx:id="difficultyLabel" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                                  </children>
                               </GridPane>
                               <GridPane vgap="8.0">

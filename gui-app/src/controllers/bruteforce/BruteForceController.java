@@ -131,9 +131,6 @@ public class BruteForceController {
     }
 
 
-
-
-
     public void addWordToMessage(ActionEvent e){
         String word = dictionaryCbox.getSelectionModel().getSelectedItem();
         String message = this.originalMessage.getText();

@@ -8,7 +8,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import jaxb.generated.CTEEnigma;
 import machine.Engine;
+import users.Battlefield;
+import users.UBoat;
+import users.User;
+import users.UserManager;
 import utils.Constants;
+import utils.servlet.ServletUtils;
+import utils.servlet.SessionUtils;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -22,6 +28,14 @@ public class FileUploadServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
+        String uboatName = SessionUtils.getUsername(request);
+        UserManager users = ServletUtils.getUserManager(getServletContext());
+        User user = users.getUser(uboatName);
+
+        if(!(user instanceof UBoat)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
         PrintWriter out = response.getWriter();
         Part part = request.getParts().iterator().next();
@@ -30,13 +44,24 @@ public class FileUploadServlet extends HttpServlet {
         Engine engine = new Engine();
         try {
             CTEEnigma cteEnigma  = engine.loadMachineFromInputStream(is);
+            UBoat uboat = (UBoat) user;
+            uboat.setMachine(cteEnigma);
+            String battleName = cteEnigma.getCTEBattlefield().getBattleName();
+
+            // Creating battle object
+            User battle = new Battlefield(battleName, uboat);
+            users.addUser(battleName,battle);
+
+
             String json = Constants.GSON_INSTANCE.toJson(cteEnigma);
             out.print(json);
             response.setStatus(HttpServletResponse.SC_OK);
+            saveEnigmaMachine((UBoat) user,cteEnigma);
 
 
         } catch (JAXBException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("text/plain");
             response.getOutputStream().println("JAXB FILE ERROR");
         }
 
@@ -47,25 +72,12 @@ public class FileUploadServlet extends HttpServlet {
 
     }
 
-
-    private void printPart(Part part, PrintWriter out) {
-        StringBuilder sb = new StringBuilder();
-        sb
-                .append("Parameter Name: ").append(part.getName()).append("\n")
-                .append("Content Type (of the file): ").append(part.getContentType()).append("\n")
-                .append("Size (of the file): ").append(part.getSize()).append("\n")
-                .append("Part Headers:").append("\n");
-
-        for (String header : part.getHeaderNames()) {
-            sb.append(header).append(" : ").append(part.getHeader(header)).append("\n");
-        }
-
-        out.println(sb.toString());
+    private void saveEnigmaMachine(UBoat uboat, CTEEnigma cteEnigma) {
+        uboat.setMachine(cteEnigma);
     }
 
-    private String readFromInputStream(InputStream inputStream) {
-        return new Scanner(inputStream).useDelimiter("\\Z").next();
-    }
+
+
 
     private void printFileContent(String content, PrintWriter out) {
         out.println("File content:");

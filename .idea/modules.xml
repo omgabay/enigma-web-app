@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AlliesClient/AlliesClient.iml" filepath="$PROJECT_DIR$/AlliesClient/AlliesClient.iml" />
       <module fileurl="file://$PROJECT_DIR$/Enigma.iml" filepath="$PROJECT_DIR$/Enigma.iml" />
       <module fileurl="file://$PROJECT_DIR$/agentClient/agentClient.iml" filepath="$PROJECT_DIR$/agentClient/agentClient.iml" />
-      <module fileurl="file://$PROJECT_DIR$/alliesClient/alliesClient.iml" filepath="$PROJECT_DIR$/alliesClient/alliesClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/gui-app/gui-app.iml" filepath="$PROJECT_DIR$/gui-app/gui-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/reflection/reflection.iml" filepath="$PROJECT_DIR$/reflection/reflection.iml" />

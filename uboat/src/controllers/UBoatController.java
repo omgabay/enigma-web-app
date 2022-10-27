@@ -1,4 +1,6 @@
 package controllers;
+import auxiliary.Dictionary;
+import auxiliary.Message;
 import ex3.Battlefield;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,12 +13,12 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import machine.Engine;
+import machine.Enigma;
 import machine.IEngine;
 import okhttp3.*;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.jetbrains.annotations.NotNull;
+import users.UBoat;
 
 import static utils.Configuration.*;
 import static utils.http.HttpClientUtil.HTTP_CLIENT;
@@ -39,65 +42,56 @@ public class UBoatController {
     @FXML Label nameLabel;
 
 
-    @FXML
-    private Label rotorCountLabel;
+    @FXML Label rotorCountLabel;
 
-    @FXML
-    private Label machineRotorCountLabel;
+    @FXML Label machineRotorCountLabel;
 
-    @FXML
-    private Label reflectorCountLabel;
+    @FXML Label reflectorCountLabel;
 
-    @FXML
-    private Label alphabetLabel;
+    @FXML Label alphabetLabel;
 
-    @FXML
-    private Label battlefieldLabel;
+    @FXML Label battlefieldLabel;
 
-    @FXML
-    private Label difficultyLabel;
+    @FXML Label difficultyLabel;
 
-
-
-    @FXML
-    private ToggleGroup reflectorSelection;
+    @FXML ToggleGroup reflectorSelection;
 
 
     // ComboBoxes for Code setup
 
-    @FXML
-    private HBox rotorPositionsCbox;
+    @FXML HBox rotorPositionsCbox;
 
-    @FXML
-    private HBox rotorIdsCbox;
+    @FXML HBox rotorIdsCbox;
 
 
     // Current Machine Setup Label
 
-    @FXML
-    private Label currentSetupLabel;
+    @FXML Label currentSetupLabel;
 
+    @FXML TextField uboatMessage;
 
+    @FXML TextField secretMessage;
 
-
-    @FXML
-    private TextField uboatMessage;
-
-    @FXML
-    private TextField secretMessage;
+    @FXML ComboBox<String> dictionaryCbox;
 
 
     private final StringProperty uboatNameProperty;
     private final StringProperty loadStatusMessageProperty;
 
+    private final StringProperty currentMachineSetupProperty = new SimpleStringProperty("");
+
     private final IEngine engine = new Engine();
 
+    private Enigma enigmaMachine;
+    private UBoat uboat;
 
 
-    public UBoatController(String uboatName){
 
-        uboatNameProperty = new SimpleStringProperty(uboatName + "'s UBoat");
+    public UBoatController(UBoat uboat){
+        this.uboat = uboat;
+        uboatNameProperty = new SimpleStringProperty(uboat.getName() + "'s UBoat");
         loadStatusMessageProperty = new SimpleStringProperty("");
+
 
     }
 
@@ -105,6 +99,7 @@ public class UBoatController {
     public void initialize(){
         fileLoadLabel.textProperty().bind(loadStatusMessageProperty);
         nameLabel.textProperty().bind(uboatNameProperty);
+        currentSetupLabel.textProperty().bind(currentMachineSetupProperty);
     }
 
 
@@ -113,6 +108,10 @@ public class UBoatController {
         fileChooser.setTitle("Open Enigma XML File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Enigma XML", "*.xml"));
         File file = fileChooser.showOpenDialog(stage);
+
+        if(file == null){
+            return;
+        }
 
 
         RequestBody body =
@@ -139,13 +138,12 @@ public class UBoatController {
                     try {
                         String json = response.body().string();
                         System.out.println("uboat client received:" + json);
+                        engine.loadFromJson(json);
+
+
                         Platform.runLater(() -> {
-                            engine.loadFromJson(json);
                             loadStatusMessageProperty.set(file.getName());
                             updateUI();
-
-
-
                         });
 
                     }catch(NullPointerException e){
@@ -169,8 +167,6 @@ public class UBoatController {
 
             throw new RuntimeException(e);
         }
-
-
     }
 
     private void updateUI() {
@@ -202,6 +198,11 @@ public class UBoatController {
 
         // Update Reflector Options
         updateReflectorOptions(reflectorCount);
+
+        // Update dictionary
+        Dictionary dictionary = engine.getDictionary();
+        ObservableList<String> words = FXCollections.observableArrayList(dictionary.getWordsList());
+        this.dictionaryCbox.setItems(words);
 
 
 
@@ -249,13 +250,14 @@ public class UBoatController {
 
     public void logoutClicked(ActionEvent actionEvent) {}
 
-    public void addWordToMessage(ActionEvent actionEvent){}
     public void createContestClicked(ActionEvent actionEvent){}
 
     public void setMachineCodeClicked(ActionEvent event){
+        // Collecting user input for machine setup
         List<Integer> rotorIDs = fetchRotorIDSelection();
         List<Character> rotorPositions = fetchRotorPositionSelection();
         String reflectorChoice = getSelectedReflector();
+
         if(rotorIDs == null || rotorPositions == null){
             System.out.println("error");
             return;
@@ -265,9 +267,18 @@ public class UBoatController {
         System.out.println("Reflector " + reflectorChoice);
 
         engine.setupMachine(rotorIDs,rotorPositions, reflectorChoice, null);
+        this.enigmaMachine = engine.getMachine();
 
+        // Updating current machine configuration label after setup
+        String currentMachineConfiguration = engine.getMachine().getCurrentConfiguration();
+        this.currentMachineSetupProperty.set(currentMachineConfiguration);
+    }
 
-        //engine.setupMachine()
+    public void createRandomMachineCode(ActionEvent event){
+        engine.setupMachineAtRandom();
+        String currentMachineConfiguration = engine.getMachine().getCurrentConfiguration();
+        this.currentMachineSetupProperty.set(currentMachineConfiguration);
+        System.out.println(currentMachineConfiguration);
     }
 
     private String getSelectedReflector() {
@@ -315,6 +326,34 @@ public class UBoatController {
 
     public void setStage(Stage stage){
         this.stage = stage;
+    }
+
+
+     public void addWordToMessage(ActionEvent event){
+        String word = (String) dictionaryCbox.getSelectionModel().getSelectedItem();
+        // Getting message from uboat text field
+        String message = this.uboatMessage.getText();
+        if(!message.isEmpty()) {
+            message = message + " " + word;
+        }else{
+            message = word;
+        }
+
+        this.uboatMessage.setText(message);
+        this.updateSecretMessage(message);
+
+
+
+    }
+
+    private void updateSecretMessage(String original) {
+        if(enigmaMachine == null){
+            return;
+        }
+        this.enigmaMachine.resetMachine();
+        Message m = this.enigmaMachine.processText(original);
+        String encrypted = m.getProcessed();
+        this.secretMessage.setText(encrypted);
     }
 
 }

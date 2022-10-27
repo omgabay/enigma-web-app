@@ -55,6 +55,10 @@ public class BruteforceProgressViewController {
 
 
 
+
+
+
+
     public BruteforceProgressViewController(){
         this.solutionObservableList = FXCollections.observableArrayList();
 
@@ -62,6 +66,7 @@ public class BruteforceProgressViewController {
 
         // default value
         taskWasPaused = false;
+
 
     }
 

@@ -16,6 +16,7 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
+import users.UBoat;
 import utils.Configuration;
 import utils.http.HttpClientUtil;
 import java.io.IOException;
@@ -66,26 +67,22 @@ public class UBoatLoginController {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String body = response.body().string();
-                String name = GSON_INSTANCE.fromJson(body, String.class);
+                UBoat uboat = GSON_INSTANCE.fromJson(body, UBoat.class);
 
                 Platform.runLater(() ->
-                        loadUboatScreen(name)
+                        loadUboatScreen(uboat)
                 );
             }
         });
 
-
-
-
-
     }
 
 
-    public void loadUboatScreen(String name){
+    public void loadUboatScreen(UBoat uboat){
         FXMLLoader loader = new FXMLLoader(getClass().getResource(MAIN_PAGE_FXML_RESOURCE_LOCATION));
         Parent root = null;
         try {
-            UBoatController controller = new UBoatController(name);
+            UBoatController controller = new UBoatController(uboat);
             loader.setController(controller);
             root = loader.load();
             controller.setStage(stage);

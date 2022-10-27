@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import utils.servlet.SessionUtils;
 
 import java.io.IOException;
 
@@ -23,7 +24,14 @@ public class CreateContestServlet extends HttpServlet {
 
         String secret = request.getParameter(SECRET_PARAM_NAME);
 
-        String uboatName = request.getParameter(UBOAT_PARAM_NAME);
+
+
+        String usernameFromSession = SessionUtils.getUsername(request);
+        if(usernameFromSession == null){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
 
     }
 }

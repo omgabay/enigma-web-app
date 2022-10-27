@@ -156,7 +156,7 @@
                            <children>
                               <TableView fx:id="solutionTableView" maxWidth="-Infinity" prefHeight="128.0" prefWidth="273.0">
                                 <columns>
-                                  <TableColumn fx:id="agentColumn" prefWidth="90.33331298828125" text="Agent" />
+                                  <TableColumn fx:id="agentColumn" prefWidth="90.33331298828125" text="AgentEntry" />
                                   <TableColumn fx:id="solutionColumn" prefWidth="181.66668701171875" text="Solution Found" />
                                 </columns>
                               </TableView>
