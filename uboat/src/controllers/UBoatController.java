@@ -1,7 +1,7 @@
 package controllers;
 import auxiliary.Dictionary;
 import auxiliary.Message;
-import ex3.Battlefield;
+import auxiliary.Battlefield;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -9,12 +9,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import machine.Engine;
 import machine.Enigma;
 import machine.IEngine;
+import main.UBoatClient;
 import okhttp3.*;
 
 import javafx.event.ActionEvent;
@@ -24,13 +26,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.jetbrains.annotations.NotNull;
+import requests.UBoatClientRefresher;
+import users.AgentEntry;
+import users.AllyTeam;
 import users.UBoat;
 
 import static utils.Configuration.*;
+import static utils.Constants.REFRESH_RATE;
 import static utils.http.HttpClientUtil.HTTP_CLIENT;
 
 public class UBoatController {
@@ -74,6 +81,13 @@ public class UBoatController {
 
     @FXML ComboBox<String> dictionaryCbox;
 
+    @FXML TableView<AllyTeam> teamsTableView;
+
+    @FXML TableColumn<AllyTeam, String> teamNameCol;
+    @FXML TableColumn<AllyTeam, Integer> agentCountCol;
+    @FXML TableColumn<AllyTeam, Integer> missionSizeCol;
+
+
 
     private final StringProperty uboatNameProperty;
     private final StringProperty loadStatusMessageProperty;
@@ -100,6 +114,18 @@ public class UBoatController {
         fileLoadLabel.textProperty().bind(loadStatusMessageProperty);
         nameLabel.textProperty().bind(uboatNameProperty);
         currentSetupLabel.textProperty().bind(currentMachineSetupProperty);
+
+        // Teams Table
+        teamNameCol.setCellValueFactory(
+                cellData -> cellData.getValue().NameProperty()
+        );;
+        agentCountCol.setCellValueFactory(
+                cellData -> cellData.getValue().getAgentCount()
+        );
+        missionSizeCol.setCellValueFactory(
+                cellData -> cellData.getValue().missionSizeProperty()
+        );
+
     }
 
 
@@ -354,6 +380,20 @@ public class UBoatController {
         Message m = this.enigmaMachine.processText(original);
         String encrypted = m.getProcessed();
         this.secretMessage.setText(encrypted);
+
+    }
+
+
+    private void updateTeamsTable(List<AllyTeam> teamsList){
+        teamsTableView.getItems().clear();
+        teamsTableView.getItems().addAll(teamsList);
+    }
+
+
+    public void startUBoatRefresher(){
+        UBoatClientRefresher clientRefresher = new UBoatClientRefresher(this::updateTeamsTable);
+        Timer timer = new Timer();
+        timer.schedule(clientRefresher,2*REFRESH_RATE,REFRESH_RATE);
     }
 
 }

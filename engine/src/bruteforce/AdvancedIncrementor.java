@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
-public class AdvancedIncrementor extends Incrementor {
+public class AdvancedIncrementor extends Incrementor{
     private final int reflectorCount;
     public AdvancedIncrementor(List<Integer> rotors, int base, int reflectorCount){
         super(base, rotors.size(), rotors);

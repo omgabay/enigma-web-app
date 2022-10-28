@@ -6,13 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.List;
 
 import users.User;
 import users.UserManager;
+
 import utils.servlet.ServletUtils;
 
-import java.util.List;
-import java.util.Set;
 
 
 public class UsersListServlet extends HttpServlet {

@@ -1,4 +1,4 @@
-package logic;
+package bruteforce;
 import java.util.List;
 
 public class AgentTask {

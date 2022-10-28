@@ -31,11 +31,11 @@
 
 
     <servlet>
-        <servlet-name>GetTeam</servlet-name>
-        <servlet-class>servlets.allies.GetAllTeamsServlet</servlet-class>
+        <servlet-name>GetContestTeams</servlet-name>
+        <servlet-class>servlets.allies.GetContestTeamsServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>GetTeam</servlet-name>
+        <servlet-name>GetContestTeams</servlet-name>
         <url-pattern>/teams</url-pattern>
     </servlet-mapping>
 
@@ -79,6 +79,93 @@
         <servlet-name>GetTeamServlet</servlet-name>
         <url-pattern>/team</url-pattern>
     </servlet-mapping>
+
+
+
+    <servlet>
+        <servlet-name>JoinContest</servlet-name>
+        <servlet-class>servlets.allies.JoinContestServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JoinContest</servlet-name>
+        <url-pattern>/join</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>GetUser</servlet-name>
+        <servlet-class>servlets.testing.GetUserServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>GetUser</servlet-name>
+        <url-pattern>/user</url-pattern>
+    </servlet-mapping>
+
+
+
+    <servlet>
+        <servlet-name>AddCandidateSolution</servlet-name>
+        <servlet-class>servlets.agent.AddCandidateSolutionServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AddCandidateSolution</servlet-name>
+        <url-pattern>/candidate-solutions/add</url-pattern>
+    </servlet-mapping>
+
+
+
+    <servlet>
+        <servlet-name>GetCandidateSolutions</servlet-name>
+        <servlet-class>servlets.bruteforce.GetSolutionsServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>GetCandidateSolutions</servlet-name>
+        <url-pattern>/candidate-solutions</url-pattern>
+    </servlet-mapping>
+
+
+
+
+    <servlet>
+        <servlet-name>GetEnigmaMachine</servlet-name>
+        <servlet-class>servlets.agent.GetEnigmaServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>GetEnigmaMachine</servlet-name>
+        <url-pattern>/enigma</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>ReadyUpdate</servlet-name>
+        <servlet-class>servlets.allies.ReadyUpdateServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ReadyUpdate</servlet-name>
+        <url-pattern>/i-am-ready</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>GetUBoatList</servlet-name>
+        <servlet-class>servlets.allies.GetUBoatsServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>GetUBoatList</servlet-name>
+        <url-pattern>/uboats</url-pattern>
+    </servlet-mapping>
+
+
+
+
+
+
 
 
 

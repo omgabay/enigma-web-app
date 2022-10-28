@@ -3,7 +3,7 @@ package machine;
 import auxiliary.Alphabet;
 import auxiliary.Dictionary;
 import auxiliary.EngineResponse;
-import ex3.Battlefield;
+import auxiliary.Battlefield;
 import jaxb.generated.CTEEnigma;
 import machine.parts.Reflector;
 import machine.parts.Rotor;

@@ -13,7 +13,7 @@ public class DM{
 
 
 
-    private final LinkedList<SimpleIncrementor> machineIncrementors;
+    private final LinkedList<SimpleIncrementor> incrementorList;
     private final long JOB_SIZE;
 
 
@@ -39,7 +39,7 @@ public class DM{
         this.reflectorCount = engine.getNumOfReflectors();
 
 
-        this.machineIncrementors = new LinkedList<>();
+        this.incrementorList = new LinkedList<>();
         this.alphabetSize = engine.getMachineAlphabet().size();
 
         this.winnerFound = false;
@@ -57,8 +57,8 @@ public class DM{
         }
         List<AgentTask> tasks = new ArrayList<>();
 
-        while(!machineIncrementors.isEmpty() && numberOfTasks > 0){
-            SimpleIncrementor incrementor = machineIncrementors.removeFirst();
+        while(!incrementorList.isEmpty() && numberOfTasks > 0){
+            SimpleIncrementor incrementor = incrementorList.removeFirst();
             numberOfTasks--;
         }
 
@@ -72,13 +72,13 @@ public class DM{
     public void run() {
 
 
-                System.out.println("Decryption manger got " +machineIncrementors.size() +" Incrementors in the list");
+                System.out.println("Decryption manger got " + incrementorList.size() +" Incrementors in the list");
                 System.out.println("Number of tasks is " + this.getNumberOfTasks());
 
 
-                while (!this.machineIncrementors.isEmpty()) {
+                while (!this.incrementorList.isEmpty()) {
                     // Remove Incrementor(Counter) from the list
-                    SimpleIncrementor incrementor = machineIncrementors.removeFirst();
+                    SimpleIncrementor incrementor = incrementorList.removeFirst();
                     long currentCount = incrementor.getValue();
 
 
@@ -94,7 +94,7 @@ public class DM{
 
                     // Moving the popped incrementor to the end of the list
                     if(!incrementor.finished()) {
-                        machineIncrementors.addLast(incrementor);
+                        incrementorList.addLast(incrementor);
                     }
 
 
@@ -113,7 +113,7 @@ public class DM{
     private void createIncrementorsLevelEasy() {
         MachineInfo info = (MachineInfo) engine.getMachineInfo().getData();
         List<Integer> ids = info.getRotorIDs();
-        this.machineIncrementors.add(new SimpleIncrementor(alphabetSize, ids.size(), ids));
+        this.incrementorList.add(new SimpleIncrementor(alphabetSize, ids.size(), ids));
     }
 
 
@@ -124,7 +124,7 @@ public class DM{
         List<Integer> ids = info.getRotorIDs();
 
 
-        this.machineIncrementors.add(new AdvancedIncrementor(ids,alphabetSize,reflectorCount));
+        this.incrementorList.add(new AdvancedIncrementor(ids,alphabetSize,reflectorCount));
     }
 
     private void createIncrementorsLevelHard(){
@@ -137,7 +137,7 @@ public class DM{
         System.out.println("Number of permutation is " + permutations.size());
 
         for (List<Integer> rotorPermutation   : permutations) {
-            this.machineIncrementors.add(new AdvancedIncrementor(rotorPermutation,alphabetSize,reflectorCount));
+            this.incrementorList.add(new AdvancedIncrementor(rotorPermutation,alphabetSize,reflectorCount));
         }
     }
 
@@ -150,7 +150,7 @@ public class DM{
         for (List<Integer>  rotors  : subsets(totalRotors , selectedRotors)){
             List<List<Integer>> permutations = getAllPermutations(rotors);
             for (List<Integer> rotorPermutation   : permutations) {
-                this.machineIncrementors.add(new AdvancedIncrementor(rotorPermutation,alphabetSize,reflectorCount));
+                this.incrementorList.add(new AdvancedIncrementor(rotorPermutation,alphabetSize,reflectorCount));
             }
         }
 
@@ -210,11 +210,11 @@ public class DM{
 
 
     public long getNumberOfTasks(){
-        long tasksPerConfiguration = machineIncrementors.get(0).getMaxValue() / JOB_SIZE;
+        long tasksPerConfiguration = incrementorList.get(0).getMaxValue() / JOB_SIZE;
         if(tasksPerConfiguration % JOB_SIZE != 0){
             tasksPerConfiguration += 1;
         }
-        return tasksPerConfiguration * machineIncrementors.size();
+        return tasksPerConfiguration * incrementorList.size();
     }
 
 

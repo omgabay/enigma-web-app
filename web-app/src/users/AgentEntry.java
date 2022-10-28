@@ -1,5 +1,11 @@
 package users;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.value.ObservableValue;
+
+import java.util.List;
+
 public class AgentEntry extends User {
 
 
@@ -12,6 +18,8 @@ public class AgentEntry extends User {
      * Number of threads for BruteForce task
      */
     private int workersCount;
+
+    List<String> myCandidateSolutions;
 
 
     public AgentEntry(String name, String team, long taskSize, int workers){
@@ -31,5 +39,23 @@ public class AgentEntry extends User {
 
     public int getWorkersCount() {
         return workersCount;
+    }
+
+
+
+
+
+
+
+    public void addNewCandidateSolution(String candidate){
+        this.myCandidateSolutions.add(candidate);
+    }
+
+    public ObservableValue<Integer> WorkerCountProperty() {
+        return new SimpleIntegerProperty(this.workersCount).asObject();
+    }
+
+    public ObservableValue<Long> TaskSizeProperty() {
+        return new SimpleLongProperty(this.taskSize).asObject();
     }
 }

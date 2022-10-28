@@ -1,5 +1,8 @@
 package users;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+
 public class User {
 
     public final String username;
@@ -18,5 +21,10 @@ public class User {
 
     public String getName(){
         return username;
+    }
+
+
+    public ObservableValue<String> NameProperty() {
+        return new SimpleStringProperty(this.username);
     }
 }

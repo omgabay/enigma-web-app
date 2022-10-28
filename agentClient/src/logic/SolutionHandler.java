@@ -1,5 +1,6 @@
 package logic;
 
+import bruteforce.AgentSolutionEntry;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -51,6 +52,8 @@ public class SolutionHandler implements Runnable{
     }
 
     private void sendCandidateToServer(String candidate) {
+        AgentSolutionEntry solutionEntry = new AgentSolutionEntry()
+
         String finalUrl = HttpUrl
                 .parse(SUBMIT_CANDIDATE_SOLUTION)
                 .newBuilder()

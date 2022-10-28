@@ -7,10 +7,9 @@ import utils.Constants;
 import utils.servlet.ServletUtils;
 import utils.servlet.SessionUtils;
 import jakarta.servlet.http.HttpServlet;
-
 import java.io.IOException;
-
 import static utils.Constants.*;
+
 
 
 public class LoginServlet extends HttpServlet {
@@ -19,7 +18,11 @@ public class LoginServlet extends HttpServlet {
 
 
 
-
+    /**
+     *  Params for request - username = user that wants to login
+     *                       type = client type
+     *
+     */
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");

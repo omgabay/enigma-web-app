@@ -7,27 +7,27 @@ import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import users.AllyTeam;
-import utils.Constants;
+import utils.CommonConstants;
 import utils.http.HttpClientUtil;
 
 import java.io.IOException;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 
-import static utils.Constants.GSON_INSTANCE;
+import static utils.CommonConstants.GSON_INSTANCE;
 
-public class TeamViewRefresher extends TimerTask {
+public class TeamDataRefresher extends TimerTask {
 
     Consumer<AllyTeam> allyConsumer;
 
-    public TeamViewRefresher(Consumer<AllyTeam> allyConsumer) {
+    public TeamDataRefresher(Consumer<AllyTeam> allyConsumer) {
         this.allyConsumer = allyConsumer;
     }
 
     @Override
     public void run() {
         String finalUrl = HttpUrl
-                .parse(Constants.TEAM_RESOURCE)
+                .parse(CommonConstants.TEAM_RESOURCE)
                 .newBuilder()
                 .build()
                 .toString();

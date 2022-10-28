@@ -4,8 +4,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import users.AllyTeam;
+import users.UBoat;
 import users.UserManager;
 import utils.servlet.ServletUtils;
+import utils.servlet.SessionUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,18 +16,24 @@ import java.util.List;
 
 import static utils.Constants.GSON_INSTANCE;
 
-public class GetAllTeamsServlet extends HttpServlet {
+public class GetContestTeamsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
         response.setContentType("application/json");
-//        String teamName = request.getParameter(TEAM_NAME_PARAM);
-//
-//        if(teamName == null || teamName.isEmpty()){
-//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//            return;
-//        }
+
+        String userFromSession = SessionUtils.getUsername(request);
+
         UserManager users = ServletUtils.getUserManager(getServletContext());
-        List<String> teams = users.getTeamsList();
+        UBoat uboat = users.getUboat(userFromSession);
+
+        if(uboat == null){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("Cannot fetch competing teams.. UBoat " + userFromSession + " was not found." );
+            return;
+        }
+
+
+        List<AllyTeam> teams = uboat.getAllyTeams();
         String jsonResponse = GSON_INSTANCE.toJson(teams);
         try(PrintWriter out = response.getWriter()) {
             out.print(jsonResponse);

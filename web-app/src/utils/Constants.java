@@ -3,8 +3,6 @@ package utils;
 //import com.google.gson.Gson;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import users.UBoat;
 
 public class Constants {
 
@@ -16,6 +14,8 @@ public class Constants {
 
     // Server resources locations
     public final static String BASE_DOMAIN = "localhost";
+
+
     private final static String BASE_URL = "http://" + BASE_DOMAIN + ":8080";
     private final static String CONTEXT_PATH = "cracking-enigma";
     private final static String FULL_SERVER_PATH = BASE_URL + CONTEXT_PATH;
@@ -29,6 +29,8 @@ public class Constants {
 
     public static final String AGENT_LIST_RESOURCE = FULL_SERVER_PATH + "/agents";
 
+    public static final String JOIN_CONTEST_URL = FULL_SERVER_PATH + "/join";
+
 
 
 
@@ -36,7 +38,9 @@ public class Constants {
 
     // Parameters
     public static final String USERNAME = "username";
-    public static final String USER_NAME_ERROR = "username_error";
+    public static final String UBOAT = "uboat";
+    public static final String CANDIDATE_PARAM = "candidate";
+
     public static final String CLIENT_TYPE = "type";
     public static final String TEAM_NAME_PARAM = "team";
     public static final String TASK_SIZE = "taskSize";
@@ -44,6 +48,9 @@ public class Constants {
     public static final String AGENT_WORKER_COUNT = "workers";
 
     public static final String AGENT_TASK_SIZE = "taskSize";
+
+    public static final String SOLUTIONS_VERSION_PARAMETER = "version";
+    public static final String AGENT_NAME_PARAM = "agent";
 
 
 

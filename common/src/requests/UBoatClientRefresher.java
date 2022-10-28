@@ -1,11 +1,14 @@
-package utils.requests;
+package requests;
 
 import com.google.gson.reflect.TypeToken;
+import javafx.application.Platform;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
+import users.AllyTeam;
+import users.UBoat;
 import utils.Constants;
 import utils.http.HttpClientUtil;
 
@@ -16,13 +19,16 @@ import java.util.function.Consumer;
 
 import static utils.Constants.GSON_INSTANCE;
 
-public class TeamListRefresher extends TimerTask {
+public class UBoatClientRefresher extends TimerTask {
 
-    Consumer<List<String>> teamsViewConsumer;
 
-    public TeamListRefresher(Consumer<List<String>> teamsListConsumer){
-        teamsViewConsumer = teamsListConsumer;
+    Consumer<List<AllyTeam>> updateUboatTeams;
+
+    public UBoatClientRefresher(Consumer<List<AllyTeam>> teamListConsumer){
+        updateUboatTeams = teamListConsumer;
     }
+
+
 
     @Override
     public void run() {
@@ -31,22 +37,25 @@ public class TeamListRefresher extends TimerTask {
                 .newBuilder()
                 .build()
                 .toString();
-
         HttpClientUtil.runAsync(finalUrl, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                System.out.println("Something went wrong with request for the list of teams");
+
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if(response.isSuccessful()){
+                List<AllyTeam> uboatTeams;
+                if (response.isSuccessful()) {
                     String rawBody = response.body().string();
-                    List<String> teamNames = GSON_INSTANCE.fromJson(rawBody, new TypeToken<List<String>>(){}.getType());
-                    teamsViewConsumer.accept(teamNames);
+                    uboatTeams = GSON_INSTANCE.fromJson(rawBody, new TypeToken<List<UBoat>>(){}.getType());
+                    Platform.runLater(() ->{
+                        updateUboatTeams.accept(uboatTeams);
+                    });
                 }
             }
         });
+
 
     }
 }

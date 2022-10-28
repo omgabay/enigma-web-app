@@ -1,4 +1,4 @@
-package ex3;
+package auxiliary;
 
 import jaxb.generated.CTEBattlefield;
 

@@ -20,5 +20,6 @@
     </orderEntry>
     <orderEntry type="module" module-name="engine" />
     <orderEntry type="module" module-name="web-app" />
+    <orderEntry type="module" module-name="common" />
   </component>
 </module>

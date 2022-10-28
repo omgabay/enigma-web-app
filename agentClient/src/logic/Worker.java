@@ -2,6 +2,8 @@ package logic;
 
 import auxiliary.Dictionary;
 import auxiliary.Message;
+import bruteforce.AgentSolutionEntry;
+import bruteforce.AgentTask;
 import machine.Enigma;
 import machine.IEngine;
 import machine.parts.Reflector;
@@ -12,35 +14,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class Worker implements Runnable {
     private final Enigma machine;
-
     private final List<Rotor> rotors;
-
     private final List<Reflector> reflectors;
-
     private final BlockingQueue<AgentTask> tasksQueue;
-
     private final Dictionary dictionary;
-
-    private SolutionHandler solutionHandler;
+    private Consumer<List<AgentSolutionEntry>> solutionsConsumer;
 
     private String encodedMesage;
     private boolean gameIsRunning;
 
 
 
-    public Worker(IEngine engine, String encodedMsg, BlockingQueue<AgentTask> tasks, SolutionHandler handler){
+    public Worker(IEngine engine, String encodedMsg, BlockingQueue<AgentTask> tasks, Consumer<List<AgentSolutionEntry>> sendSolutions){
 
         this.machine = engine.getMachine();
         this.rotors = engine.getRotorsFromEngine();
         this.reflectors = engine.getReflectorsFromEngine();
         this.dictionary = engine.getDictionary();
         this.encodedMesage = encodedMsg;
-
+        this.solutionsConsumer = sendSolutions;
         this.tasksQueue = tasks;
-        this.solutionHandler = handler;
         gameIsRunning = true;
 
     }
@@ -71,6 +69,7 @@ public class Worker implements Runnable {
 
             // Getting ticks -- how many times to iterate on rotor combinations
             long ticks = task.getTicks();
+            List<AgentSolutionEntry> solutions = new ArrayList<>();
 
             for(int i=0; i<ticks; i++){
                  // Saving rotor initial position
@@ -82,14 +81,22 @@ public class Worker implements Runnable {
                 // success is True when the processed text is a valid sentence
                 String processed = message.getProcessed();
                 if(dictionary.checkCorrectness(processed)){
-                    solutionHandler.addCandidateSolution(processed);
+                    AgentSolutionEntry solutionEntry = new AgentSolutionEntry()
+
                 }
+                machine.setRotorPositions(savePositions);
+                rotorsIterator.next();
+
             }
+
+
 
         }
 
 
     }
+
+
 
 
 

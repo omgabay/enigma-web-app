@@ -6,6 +6,7 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
+import users.AgentEntry;
 import users.UBoat;
 import utils.Constants;
 import utils.http.HttpClientUtil;
@@ -15,16 +16,18 @@ import java.util.List;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 
-import static utils.Constants.GSON_INSTANCE;
+import static utils.Configuration.GSON_INSTANCE;
 
-public class UBoatListRefresher extends TimerTask {
-    private Consumer<List<UBoat>> uboatListConsumer;
-    public UBoatListRefresher(Consumer<List<UBoat>> uboatListConsumer){
+public class AlliesRefresherTask extends TimerTask {
+    private Consumer<List<UBoat>> uboatConsumer;
+    private Consumer<List<AgentEntry>> updateTable;
 
-        this.uboatListConsumer = uboatListConsumer;
-        UBoat uboat;
-
+    public AlliesRefresherTask(Consumer<List<UBoat>> uboatConsumer, Consumer<List<AgentEntry>> updateAgentsTable){
+        this.uboatConsumer = uboatConsumer;
+        this.updateTable = updateAgentsTable;
     }
+
+
     @Override
     public void run() {
         String finalUrl = HttpUrl
@@ -43,8 +46,8 @@ public class UBoatListRefresher extends TimerTask {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if(response.isSuccessful()){
                     String rawBody = response.body().string();
-                    List<UBoat> uboats = GSON_INSTANCE.fromJson(rawBody, new TypeToken<List<UBoat>>(){}.getType());
-                    uboatListConsumer.accept(uboats);
+                    List<UBoat> uboats = GSON_INSTANCE.fromJson(rawBody,new TypeToken<List<UBoat>>(){}.getType());
+                    uboatConsumer.accept(uboats);
                 }
             }
         });

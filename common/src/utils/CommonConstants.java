@@ -4,7 +4,7 @@ package utils;
 
 import com.google.gson.Gson;
 
-public class Constants {
+public class CommonConstants {
 
     // global constants
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -14,6 +14,7 @@ public class Constants {
 
     // Server resources locations
     public final static String BASE_DOMAIN = "localhost";
+    public static final String CANDIDATE_PARAM = "candidate";
     private final static String BASE_URL = "http://" + BASE_DOMAIN + ":8080";
     private final static String CONTEXT_PATH = "cracking-enigma";
     private final static String FULL_SERVER_PATH = BASE_URL + CONTEXT_PATH;

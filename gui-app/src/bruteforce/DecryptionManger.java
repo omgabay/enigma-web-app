@@ -19,7 +19,7 @@ public class DecryptionManger implements Runnable {
 
     private final Thread handlerThread;
     private final JobResultHandler resultHandler;
-    private final LinkedList<SimpleIncrementor> machineIncrementors;
+    private final LinkedList<Incrementor> machineIncrementors;
     private final int difficulty;
     private final long JOB_SIZE;
 
@@ -90,7 +90,7 @@ public class DecryptionManger implements Runnable {
 
                 while (!this.machineIncrementors.isEmpty()) {
                     // Remove Incrementor(Counter) from the list
-                    SimpleIncrementor incrementor = machineIncrementors.removeFirst();
+                    Incrementor incrementor = machineIncrementors.removeFirst();
                     long currentCount = incrementor.getValue();
 
                     if(this.isPaused){
@@ -145,7 +145,7 @@ public class DecryptionManger implements Runnable {
     private void createIncrementorsLevelEasy() {
         MachineInfo info = (MachineInfo) engine.getMachineInfo().getData();
         List<Integer> ids = info.getRotorIDs();
-        this.machineIncrementors.add(new SimpleIncrementor(alphabetSize, ids.size(), ids));
+        this.machineIncrementors.add(new Incrementor(alphabetSize, ids.size(), ids));
     }
 
 

@@ -7,7 +7,7 @@ import javax.xml.bind.Unmarshaller;
 import auxiliary.*;
 import auxiliary.Dictionary;
 import com.google.gson.Gson;
-import ex3.Battlefield;
+import auxiliary.Battlefield;
 import exceptions.EnigmaException;
 import exceptions.InvalidConfigurationException;
 import exceptions.ReflectorNotFound;

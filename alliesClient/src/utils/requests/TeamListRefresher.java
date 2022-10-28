@@ -6,7 +6,7 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import utils.Constants;
+import utils.CommonConstants;
 import utils.http.HttpClientUtil;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 
-import static utils.Constants.GSON_INSTANCE;
+import static utils.CommonConstants.GSON_INSTANCE;
 
 public class TeamListRefresher extends TimerTask {
 
@@ -27,7 +27,7 @@ public class TeamListRefresher extends TimerTask {
     @Override
     public void run() {
         String finalUrl = HttpUrl
-                .parse(Constants.TEAMS_LIST_RESOURCE)
+                .parse(CommonConstants.TEAMS_LIST_RESOURCE)
                 .newBuilder()
                 .build()
                 .toString();

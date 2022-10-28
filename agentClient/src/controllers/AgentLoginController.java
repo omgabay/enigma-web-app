@@ -12,8 +12,8 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import utils.requests.TeamListRefresher;
 import users.AgentEntry;
+import utils.requests.TeamListRefresher;
 import utils.Configuration;
 import utils.http.HttpClientUtil;
 

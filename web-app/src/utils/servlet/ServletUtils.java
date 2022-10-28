@@ -60,5 +60,17 @@ public class ServletUtils {
     }
 
 
+    public static int getIntParameter(HttpServletRequest request, String name) {
+        String value = request.getParameter(name);
+        if (value != null) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException numberFormatException) {
+            }
+        }
+        return INT_PARAMETER_ERROR;
+    }
+
+
 
 }

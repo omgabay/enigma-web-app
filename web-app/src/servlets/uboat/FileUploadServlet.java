@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import jaxb.generated.CTEEnigma;
 import machine.Engine;
-import users.Battlefield;
 import users.UBoat;
 import users.User;
 import users.UserManager;
@@ -18,7 +17,6 @@ import utils.servlet.SessionUtils;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
-import java.util.Scanner;
 
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
@@ -48,9 +46,7 @@ public class FileUploadServlet extends HttpServlet {
             uboat.setMachine(cteEnigma);
             String battleName = cteEnigma.getCTEBattlefield().getBattleName();
 
-            // Creating battle object
-            User battle = new Battlefield(battleName, uboat);
-            users.addUser(battleName,battle);
+
 
 
             String json = Constants.GSON_INSTANCE.toJson(cteEnigma);
@@ -59,10 +55,10 @@ public class FileUploadServlet extends HttpServlet {
             saveEnigmaMachine((UBoat) user,cteEnigma);
 
 
-        } catch (JAXBException e) {
+        } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("text/plain");
-            response.getOutputStream().println("JAXB FILE ERROR");
+            response.getOutputStream().println(e.getMessage());
         }
 
 

@@ -6,10 +6,10 @@ public class UserManager {
     private final Map<String, User> mapNameToUser;
 
     private final  List<String> teams;
+    private final List<UBoat> uboats;
 
     private final Map<String, AllyTeam> mapAllyTeams;
 
-    private final List<String> uboats;
 
 
 
@@ -42,7 +42,7 @@ public class UserManager {
                 break;
             case UBOAT:
                 System.out.println("welcome uboat " + username +"!");
-                uboats.add(username);
+                uboats.add((UBoat)user);
         }
     }
 
@@ -67,6 +67,9 @@ public class UserManager {
 
 
     public UBoat getUboat(String name){
+        if(name == null){
+            return null;
+        }
         User uboat = mapNameToUser.get(name);
         if(uboat instanceof UBoat){
             return (UBoat) uboat;
@@ -74,15 +77,32 @@ public class UserManager {
         return null;
     }
 
-    public List<String> getTeamsList() {
-        return this.teams;
-    }
 
     public AllyTeam getTeam(String teamName) {
-        User user = this.mapNameToUser.get(teamName);
-        if(!(user instanceof AllyTeam)){
+        if(teamName == null || teamName.isEmpty()){
             return null;
         }
-        return (AllyTeam) user;
+        User user = this.mapNameToUser.get(teamName);
+        if(user instanceof AllyTeam){
+            return (AllyTeam) user;
+        }
+        return null;
+    }
+
+    public AgentEntry getAgent(String name) {
+        if(name == null){
+            return null;
+        }
+        User agent = mapNameToUser.get(name);
+        if(agent instanceof AgentEntry){
+            return (AgentEntry) agent;
+        }
+        return null;
+
+
+    }
+
+    public List<UBoat> getAllUBoats() {
+        return this.uboats;
     }
 }
