@@ -1,0 +1,1 @@
+java -jar artifacts-targil2/gui-app.jar

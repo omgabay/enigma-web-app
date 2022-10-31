@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Greeter/Greeter.iml" filepath="$PROJECT_DIR$/Greeter/Greeter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Hello/Hello.iml" filepath="$PROJECT_DIR$/Hello/Hello.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HelloNoDepsInManifest/HelloNoDepsInManifest.iml" filepath="$PROJECT_DIR$/HelloNoDepsInManifest/HelloNoDepsInManifest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HelloWorld/HelloWorld.iml" filepath="$PROJECT_DIR$/HelloWorld/HelloWorld.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HelloWorldNoManifest/HelloWorldNoManifest.iml" filepath="$PROJECT_DIR$/HelloWorldNoManifest/HelloWorldNoManifest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HelloWorldWar/HelloWorldWar.iml" filepath="$PROJECT_DIR$/HelloWorldWar/HelloWorldWar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JavaFXResources/JavaFXResources.iml" filepath="$PROJECT_DIR$/JavaFXResources/JavaFXResources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Resources/Resources.iml" filepath="$PROJECT_DIR$/Resources/Resources.iml" />
+    </modules>
+  </component>
+</project>

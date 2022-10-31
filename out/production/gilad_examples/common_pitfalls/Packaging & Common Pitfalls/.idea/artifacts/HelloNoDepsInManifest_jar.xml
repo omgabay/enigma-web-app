@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="HelloNoDepsInManifest:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/HelloNoDepsInManifest_jar</output-path>
+    <root id="archive" name="HelloNoDepsInManifest.jar">
+      <element id="module-output" name="HelloNoDepsInManifest" />
+    </root>
+  </artifact>
+</component>
