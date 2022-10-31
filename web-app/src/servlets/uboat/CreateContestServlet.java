@@ -1,5 +1,4 @@
 package servlets.uboat;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,8 +7,10 @@ import users.UBoat;
 import users.UserManager;
 import utils.servlet.ServletUtils;
 import utils.servlet.SessionUtils;
-
 import java.io.IOException;
+import java.io.PrintWriter;
+
+import static utils.Constants.GSON_INSTANCE;
 
 /**
  *  Uboat will send to this servlet the encrypted text the Allies teams will try to decrypt
@@ -19,7 +20,6 @@ public class CreateContestServlet extends HttpServlet {
 
     private final static String SECRET_PARAM_NAME = "secret";
 
-    private final static String UBOAT_PARAM_NAME = "uboat";
 
 
     @Override
@@ -46,15 +46,13 @@ public class CreateContestServlet extends HttpServlet {
         }
 
         uboat.setSecretMessage(secret);
-
-        uboat.createDMs();
-
-
-
-
-
-
-
-
+        boolean success = uboat.setReady();
+        String jsonResponse = GSON_INSTANCE.toJson(uboat);
+        response.setContentType("application/json");
+        try(PrintWriter out = response.getWriter()){
+            out.print(jsonResponse);
+            out.flush();
+        }
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

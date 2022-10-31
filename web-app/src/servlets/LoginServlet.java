@@ -16,8 +16,6 @@ public class LoginServlet extends HttpServlet {
 
 
 
-
-
     /**
      *  Params for request - username = user that wants to login
      *                       type = client type
@@ -32,7 +30,7 @@ public class LoginServlet extends HttpServlet {
 
         if (usernameFromSession == null) { //user is not logged in yet
 
-            String usernameFromParameter = request.getParameter(USERNAME);
+            String usernameFromParameter = request.getParameter(Constants.USERNAME);
             String clientType = request.getParameter(CLIENT_TYPE);   // UBoat , Allies team or Agent
             if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
                 //no username in session and no username in parameter - not standard situation. it's a conflict
@@ -51,7 +49,8 @@ public class LoginServlet extends HttpServlet {
 
                         // stands for unauthorized as there is already such user with this name
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        response.getOutputStream().print(errorMessage);
+                        response.setContentType("text/plain");
+                        response.getWriter().print(errorMessage);
                     }
                     else {
                         User user = createUserObject(request, usernameFromParameter, clientType);
@@ -93,9 +92,4 @@ public class LoginServlet extends HttpServlet {
         }
         return user;
     }
-
-
-
-
-
 }

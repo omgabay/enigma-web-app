@@ -130,7 +130,6 @@ public class MachineModel {
 
     public void createRandomMachine() {
         this.machine = engine.setupMachineAtRandom();
-
         updateModelAfterSetup();
     }
 

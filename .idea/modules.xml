@@ -9,7 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/gui-app/gui-app.iml" filepath="$PROJECT_DIR$/gui-app/gui-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/reflection/reflection.iml" filepath="$PROJECT_DIR$/reflection/reflection.iml" />
-      <module fileurl="file://$PROJECT_DIR$/uboat/uboat.iml" filepath="$PROJECT_DIR$/uboat/uboat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/uboatClient/uboatClient.iml" filepath="$PROJECT_DIR$/uboatClient/uboatClient.iml" />
       <module fileurl="file://$PROJECT_DIR$/web-app/web-app.iml" filepath="$PROJECT_DIR$/web-app/web-app.iml" />
     </modules>
   </component>

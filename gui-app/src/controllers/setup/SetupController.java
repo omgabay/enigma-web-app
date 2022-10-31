@@ -261,9 +261,8 @@ public class SetupController {
         Alert alert = new Alert(Alert.AlertType.ERROR,message);
         alert.setHeaderText("Wrong Input :(");
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image("/images/turing_icon.png"));
+        //stage.getIcons().add(new Image("/images/turing_icon.png"));
         alert.show();
-        return;
     }
 
 

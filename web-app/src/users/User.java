@@ -6,6 +6,9 @@ import javafx.beans.value.ObservableValue;
 public class User {
 
     public final String username;
+
+
+
     public enum ClientType {UBOAT, ALLY, AGENT, BATTLE};
     ClientType type;
 

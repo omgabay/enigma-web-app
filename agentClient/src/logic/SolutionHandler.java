@@ -52,7 +52,6 @@ public class SolutionHandler implements Runnable{
     }
 
     private void sendCandidateToServer(String candidate) {
-        AgentSolutionEntry solutionEntry = new AgentSolutionEntry()
 
         String finalUrl = HttpUrl
                 .parse(SUBMIT_CANDIDATE_SOLUTION)

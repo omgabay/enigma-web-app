@@ -1,33 +1,37 @@
 package controllers;
-
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import requests.TeamDataRefresher;
 import users.AgentEntry;
 import users.UBoat;
+import users.User;
 import utils.Constants;
+import utils.gui.CreateAlertBox;
 import utils.http.HttpClientUtil;
-
+import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
 import java.util.Timer;
 
 import static utils.CommonConstants.REFRESH_RATE;
+import static utils.Configuration.GSON_INSTANCE;
 
-public class AlliesController {
+public class AlliesController implements Closeable {
 
     @FXML TableView<AgentEntry> agentsTable;
     @FXML TableColumn<AgentEntry, String> agentNameCol;
-    @FXML TableColumn<AgentEntry,Integer> agentWorkersCol;
+    @FXML TableColumn<AgentEntry,String> agentWorkersCol;
 
-    @FXML TableColumn<AgentEntry,Long> taskSizeCol;
+    @FXML TableColumn<AgentEntry,String> taskSizeCol;
 
     @FXML TableView<UBoat> uboatsTable;
 
@@ -42,25 +46,41 @@ public class AlliesController {
     @FXML Label allyHeadingLabel;
     @FXML TextField contestPreviewLabel;
 
-    SimpleStringProperty allyClientName = new SimpleStringProperty("Ally Screen");
+    @FXML TextField agentNameLabel;
+    @FXML TextField missionSizeTF;
+    @FXML Label battleLabel;
+    @FXML Label uboatLabel;
+    @FXML Label statusLabel;
+    @FXML Label difficultyLabel;
+    @FXML Label registeredLabel;
+
+
+    private Stage stage;
+    private AlliesClientRefreshTask clientRefresher;
+
+
+
+
+    String clientName;
+    UBoat contestUboat;
+
+    BooleanProperty startBruteforceAttack = new SimpleBooleanProperty(false);
 
 
 
     Timer timer;
 
-
-
+    public AlliesController(String allyName) {
+        this.clientName = allyName;
+    }
 
 
     @FXML
     public void initialize(){
         contestTab.setDisable(true);
-
         setupUBoatTable();
         setupAgentTable();
-        allyHeadingLabel.textProperty().bind(allyClientName);
-
-        //startAllyClientRefresher();
+        allyHeadingLabel.setText("Ally " + clientName);
 
 
         uboatsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -68,18 +88,7 @@ public class AlliesController {
                 contestPreviewLabel.setText(newSelection.getName());
             }
         });
-
-        uboatsTable.getItems().add(new UBoat("Moshe"));
-        agentsTable.getItems().add(new AgentEntry("myAgent","bestTeam",900,3));
-
-        allyClientName = new SimpleStringProperty("Ally Team");
-
-
-
-
-
-
-
+        startDashboardRefresher();
     }
 
     private void setupAgentTable() {
@@ -110,7 +119,7 @@ public class AlliesController {
         );
 
         gameStatusCol.setCellValueFactory(
-                cellData -> cellData.getValue().TeamsRegisterdProperty()
+                cellData -> cellData.getValue().TeamsRegisteredProperty()
         );
 
         difficultyCol.setCellValueFactory(
@@ -118,23 +127,16 @@ public class AlliesController {
         );
     }
 
-    private void startAllyClientRefresher() {
-        TeamDataRefresher teamViewRefresher = new TeamDataRefresher(ally ->{
-            agentsTable.getItems().clear();
-            agentsTable.setItems(FXCollections.observableArrayList(ally.getAgentList()));
-        });
 
-        timer = new Timer();
-        timer.schedule(teamViewRefresher,REFRESH_RATE*2,REFRESH_RATE);
-    }
 
 
     @FXML public void joinContestClicked(){
-        if(uboatsTable.getSelectionModel().getSelectedItem() == null){
+        if(contestPreviewLabel.getText().isEmpty()){
             return;
         }
 
         String uboatName = contestPreviewLabel.getText();
+        System.out.println("Ally name " + clientName);
 
 
 
@@ -144,12 +146,14 @@ public class AlliesController {
         String finalUrl = HttpUrl
                 .parse(Constants.JOIN_CONTEST_URL)
                 .newBuilder()
-                .addQueryParameter(Constants.UBOAT,uboatName)
+                .addQueryParameter(Constants.UBOAT_PARAM,uboatName)
+                .addQueryParameter(Constants.USERNAME, this.clientName)
                 .build()
                 .toString();
         HttpClientUtil.runAsync(finalUrl, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                System.out.println("Error in joining contest");
 
             }
 
@@ -159,6 +163,7 @@ public class AlliesController {
                     Platform.runLater(()->{
                         contestTab.setDisable(false);
                         alliesTabPane.getSelectionModel().select(1);
+                        updateContestTab(uboatName);
                     });
                 }
             }
@@ -167,15 +172,157 @@ public class AlliesController {
 
     }
 
+
+
+
     @FXML public void readyBtnClicked(){
+        String finalUrl = HttpUrl
+                .parse(Constants.READY_UPDATE_URL)
+                .newBuilder()
+                .build()
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                System.out.println("Error sending ready update from Allies Client");
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.isSuccessful()){
+                    String rawBody = response.body().string();
+                    User myTeam = GSON_INSTANCE.fromJson(rawBody, User.class);
+                    System.out.println(myTeam);
+                }
+            }
+        });
+
 
     }
 
 
 
+    @FXML public void addAgentToTeam(ActionEvent event){
+        if(agentNameLabel.getText().isEmpty()){
+            String message = "Please give a name to your agent";
+            CreateAlertBox.createAlert(message,stage);
+        }
+
+        String agentName = agentNameLabel.getText();
+        String workers = String.valueOf(1);
+        String taskSize = String.valueOf(10);
+        String finalUrl = HttpUrl
+                .parse(Constants.ADD_AGENT_TO_TEAM_PAGE)
+                .newBuilder()
+                .addQueryParameter(Constants.AGENT_PARAM, agentName)
+                .addQueryParameter(Constants.AGENT_WORKER_COUNT, workers)
+                .addQueryParameter("taskSize", taskSize)
+                .build()
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.isSuccessful()){
+                    String json = response.body().string();
+                    AgentEntry agent = GSON_INSTANCE.fromJson(json,AgentEntry.class);
+                    Platform.runLater(() -> {
+                        System.out.print(json);
+                        addAgentToTable(agent);
+                    });
+                }
+            }
+        });
+
+    }
+
+    private void addAgentToTable(AgentEntry agent) {
+        this.agentsTable.getItems().add(agent);
+    }
+
+    public void updateUboatsTable(List<UBoat> uBoatList){
+        uboatsTable.getItems().clear();
+        uboatsTable.getItems().addAll(uBoatList);
+    }
+    public void updateAgentsTable(List<AgentEntry> agentEntriesList){
+        agentsTable.getItems().clear();
+        agentsTable.getItems().addAll(agentEntriesList);
+    }
+
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 
 
 
+    private void startDashboardRefresher(){
+        this.clientRefresher = new AlliesClientRefreshTask(this.clientName ,this::updateUboatsTable,this::updateAgentsTable);
+        timer = new Timer();
+        timer.schedule(clientRefresher, REFRESH_RATE, REFRESH_RATE);
+    }
+
+
+
+    @Override
+    public void close() throws IOException {
+        if (clientRefresher != null && timer != null) {
+            clientRefresher.cancel();
+            timer.cancel();
+        }
+    }
+
+
+    public void plus50(ActionEvent event){
+        int newVal = Integer.parseInt(missionSizeTF.getText()) + 50;
+        missionSizeTF.setText(String.valueOf(newVal));
+    }
+
+    public void minus50(ActionEvent event){
+        int newVal = Integer.parseInt(missionSizeTF.getText()) - 50;
+        missionSizeTF.setText(String.valueOf(newVal));
+    }
+
+    private void updateContestTab(String uboatName){
+        String finalUrl = HttpUrl
+                .parse(Constants.GET_USER_RESOURCE_PAGE)
+                 .newBuilder()
+                 .addQueryParameter(Constants.USERNAME, uboatName)
+                 .build()
+                 .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                System.err.println("Error in update contest tab");
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.isSuccessful()){
+                    String rawBody = response.body().string();
+                    UBoat uboat = GSON_INSTANCE.fromJson(rawBody,UBoat.class);
+                    Platform.runLater(()->{
+
+                        String battleName = uboat.BattleNameProperty().getValue();
+                        String uboatName = uboat.getName();
+                        String difficulty = uboat.getDifficulty();
+                        String registered = uboat.TeamsRegisteredProperty().getValue();
+                        battleLabel.setText(battleName);
+                        uboatLabel.setText(uboatName);
+                        difficultyLabel.setText((difficulty));
+                        registeredLabel.setText(registered);
+                    });
+                }
+            }
+        });
+
+    }
 
 
 

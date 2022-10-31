@@ -12,17 +12,21 @@ import java.util.List;
 public class Decryption {
 
     private LinkedList<Incrementor> incrementorList;
-    enum Difficulty {EASY, MEDIUM, HARD, INSANE};
+
+
+
 
 
 
     private final int reflectorCount;
-    private final int rotorCount;
+    private final int totalRotorCount;
     private final int alphabetSize;
 
     private final List<Integer> machineRotors;
 
     private long TASK_SIZE = 900;
+
+    private boolean bruteforceIsActive;
 
 
     private IEngine engine;
@@ -32,12 +36,13 @@ public class Decryption {
 
     public Decryption(IEngine engine, Difficulty difficulty, long taskSize){
         this.reflectorCount = engine.getNumOfReflectors();
-        this.rotorCount = engine.getTotalAvailableRotors();
+        this.totalRotorCount = engine.getTotalAvailableRotors();
         this.alphabetSize = engine.getMachineAlphabet().size();
         this.machineRotors = engine.getMachine().getRotorIDs();
         this.incrementorList = new LinkedList<>();
         createIncrementors(difficulty);
         Incrementor.setJobSize(taskSize);
+        bruteforceIsActive = true;
     }
 
 
@@ -93,9 +98,8 @@ public class Decryption {
     }
 
     private void createIncrementorsLevelHard(){
-        MachineInfo info = (MachineInfo) engine.getMachineInfo().getData();
-        List<Integer> ids = info.getRotorIDs();
-        List<List<Integer>> permutations = getAllPermutations(ids);
+
+        List<List<Integer>> permutations = getAllPermutations(machineRotors);
 
         System.out.println("permutation: " + permutations);
 
@@ -108,15 +112,15 @@ public class Decryption {
 
 
     private void createIncrementorsLevelCrazy() {
-        MachineInfo info = (MachineInfo) engine.getMachineInfo().getData();
-        int selectedRotors = info.getRotorIDs().size();
-        int totalRotors = engine.getTotalAvailableRotors();
+        int selectedRotors = this.machineRotors.size();
+        int totalRotors = this.totalRotorCount;
 
         for (List<Integer>  rotors  : subsets(totalRotors , selectedRotors)){
             List<List<Integer>> permutations = getAllPermutations(rotors);
             for (List<Integer> rotorPermutation   : permutations) {
                 this.incrementorList.add(new AdvancedIncrementor(rotorPermutation,alphabetSize,reflectorCount));
             }
+            System.out.println(permutations);
         }
     }
 
@@ -161,5 +165,20 @@ public class Decryption {
             backtrack(n, k, i + 1, result, partialList);
             partialList.remove(partialList.size() - 1);
         }
+    }
+
+
+
+    public boolean isDone() {
+        return this.incrementorList.isEmpty() || !bruteforceIsActive;
+    }
+
+
+    public void stopBruteforceTasks(){
+        bruteforceIsActive = false;
+    }
+
+    public void continueBruteforceTask(){
+        bruteforceIsActive = true;
     }
 }

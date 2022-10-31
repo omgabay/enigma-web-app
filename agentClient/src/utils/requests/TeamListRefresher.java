@@ -6,10 +6,14 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
+import users.AllyTeam;
+import users.User;
 import utils.Configuration;
+import utils.Constants;
 import utils.http.HttpClientUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.function.Consumer;
@@ -27,7 +31,7 @@ public class TeamListRefresher extends TimerTask {
     @Override
     public void run() {
         String finalUrl = HttpUrl
-                .parse(Configuration.TEAMS_LIST_RESOURCE)
+                .parse(Constants.USERS_LIST)
                 .newBuilder()
                 .build()
                 .toString();
@@ -42,7 +46,13 @@ public class TeamListRefresher extends TimerTask {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if(response.isSuccessful()){
                     String rawBody = response.body().string();
-                    List<String> teamNames = GSON_INSTANCE.fromJson(rawBody, new TypeToken<List<String>>(){}.getType());
+                    List<User> users = GSON_INSTANCE.fromJson(rawBody, new TypeToken<List<User>>(){}.getType());
+                    List<String>  teamNames = new ArrayList<>();
+                    for (User user   :      users              ) {
+                        if(user instanceof AllyTeam){
+                            teamNames.add(user.getName());
+                        }
+                    }
                     teamsViewConsumer.accept(teamNames);
                 }
             }

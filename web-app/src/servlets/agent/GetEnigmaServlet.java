@@ -15,13 +15,22 @@ public class GetEnigmaServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String uboatFromParam = request.getParameter(Constants.UBOAT);
+        String teamName = request.getParameter(Constants.TEAM_NAME_PARAM);
         UserManager users = ServletUtils.getUserManager(getServletContext());
-        UBoat uboat = users.getUboat(uboatFromParam);
+        UBoat uboat = users.getUboatByTeamName(teamName);
+
+
         PrintWriter out = response.getWriter();
         if(uboat == null){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("UBoat "+ uboatFromParam + " was not found!");
+            response.setContentType("text/plain");
+            out.print("team " + teamName +"did not register to contest");
+            return;
+        }
+        if(uboat.getMachine() == null){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("text/plain");
+            out.print("UBoat " +uboat.username + "did not load engima file");
             return;
         }
 
@@ -29,7 +38,6 @@ public class GetEnigmaServlet extends HttpServlet {
         String json =  Constants.GSON_INSTANCE.toJson(uboat.getMachine());
         out.print(json);
         response.setStatus(HttpServletResponse.SC_OK);
-
     }
 
 

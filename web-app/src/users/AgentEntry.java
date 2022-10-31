@@ -1,7 +1,6 @@
 package users;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 
 import java.util.List;
@@ -18,6 +17,7 @@ public class AgentEntry extends User {
      * Number of threads for BruteForce task
      */
     private int workersCount;
+    private boolean startBruteforce;
 
     List<String> myCandidateSolutions;
 
@@ -27,6 +27,7 @@ public class AgentEntry extends User {
         this.teamName = team;
         this.taskSize = taskSize;
         this.workersCount = workers;
+        this.startBruteforce = false;
     }
 
     public String getTeamName() {
@@ -42,20 +43,20 @@ public class AgentEntry extends User {
     }
 
 
-
-
-
-
-
     public void addNewCandidateSolution(String candidate){
         this.myCandidateSolutions.add(candidate);
     }
 
-    public ObservableValue<Integer> WorkerCountProperty() {
-        return new SimpleIntegerProperty(this.workersCount).asObject();
+    public ObservableValue<String> WorkerCountProperty() {
+        return new SimpleStringProperty(String.valueOf(this.workersCount));
     }
 
-    public ObservableValue<Long> TaskSizeProperty() {
-        return new SimpleLongProperty(this.taskSize).asObject();
+    public ObservableValue<String> TaskSizeProperty() {
+        String taskSizeString = String.valueOf(this.taskSize);
+        return new SimpleStringProperty(taskSizeString);
+    }
+
+    public void setReady(boolean startBF) {
+        this.startBruteforce = startBF;
     }
 }

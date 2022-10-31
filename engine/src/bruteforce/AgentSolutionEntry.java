@@ -1,22 +1,36 @@
 package bruteforce;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 
 import java.util.List;
+import java.util.Observable;
+import java.util.Timer;
 
 public class AgentSolutionEntry {
 
     private final String machineCode;
     private final String agentName;
-
+    private final String teamName;
     private final String candidate;
 
+    private Timer timer;
 
 
-    public AgentSolutionEntry(String agentName, String candidate, List<Integer> rotors, List<Character> positions, String reflector){
+
+
+    public AgentSolutionEntry(String agentName,String teamName,  String candidate, List<Integer> rotors, List<Character> positions, String reflector){
         this.candidate = candidate;
         this.agentName = agentName;
+        this.teamName = teamName;
         this.machineCode = buildMachineCodeString(rotors,positions,reflector);
+    }
+
+    public AgentSolutionEntry(String agentName,String teamName,  String candidate, String machineCode){
+        this.agentName = agentName;
+        this.teamName = teamName;
+        this.candidate = candidate;
+        this.machineCode = machineCode;
     }
 
 
@@ -49,9 +63,25 @@ public class AgentSolutionEntry {
         return this.agentName;
     }
 
+    public ObservableValue<String> AgentNameProperty(){return new SimpleStringProperty(this.agentName); }
+
+    public ObservableValue<String> TeamNameProperty(){return new SimpleStringProperty(this.teamName);}
+
+    public ObservableValue<String> CandidateProperty(){return  new SimpleStringProperty(this.candidate);}
+
+    public ObservableValue<String> MachineCodeProperty(){return new SimpleStringProperty(this.machineCode);}
+
 
     public String getCandidate(){
         return candidate;
+    }
+
+
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder("");
+        sb.append(this.agentName).append(" from team ").append(this.teamName).append(" found candidate - ").append(this.candidate);
+        return sb.toString();
     }
 
 }

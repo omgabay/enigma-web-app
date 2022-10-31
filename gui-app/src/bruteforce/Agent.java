@@ -22,7 +22,7 @@ public class Agent implements Runnable {
     private final Enigma machine;
     private final List<Rotor> rotors;
     private final List<Reflector> reflectors;
-    private final BlockingQueue<AgentJob> jobsQueue;
+    private final BlockingQueue<AgentTask> jobsQueue;
     private final BlockingQueue<JobResult> resultsQueue;
 
     private final String agentName;
@@ -43,7 +43,7 @@ public class Agent implements Runnable {
 
     // Idea -- to pause the consumers (aka Agents) the producer(DM) will stop creating new Jobs. The DM will not read solutions
 
-    public Agent(String name, IEngine engine, BlockingQueue<AgentJob> queue, BlockingQueue<JobResult> resultsQueue , String secretMessage){
+    public Agent(String name, IEngine engine, BlockingQueue<AgentTask> queue, BlockingQueue<JobResult> resultsQueue , String secretMessage){
 
         // Getting copy of the machine for agent
         machine = engine.getMachine();
@@ -79,7 +79,7 @@ public class Agent implements Runnable {
         while(!this.wasCanceled || !jobsQueue.isEmpty()) {
 
             //Fetching new Job from the queue
-            AgentJob job  = null;
+            AgentTask job  = null;
 
 
             try {
@@ -186,7 +186,7 @@ public class Agent implements Runnable {
     }
 
 
-    private void createAgentReply(List<String> solutions, AgentJob job, boolean success) {
+    private void createAgentReply(List<String> solutions, AgentTask job, boolean success) {
         JobResult result = new JobResult(this.agentName, solutions ,job, success);
         try {
             this.resultsQueue.put(result);

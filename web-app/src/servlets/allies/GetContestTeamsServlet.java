@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import users.AllyTeam;
 import users.UBoat;
 import users.UserManager;
+import utils.Constants;
 import utils.servlet.ServletUtils;
 import utils.servlet.SessionUtils;
 
@@ -20,15 +21,19 @@ public class GetContestTeamsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
         response.setContentType("application/json");
+        String uboatName = request.getParameter(Constants.UBOAT_PARAM);
+        if(uboatName == null){
+            uboatName = SessionUtils.getUsername(request);
+        }
 
-        String userFromSession = SessionUtils.getUsername(request);
 
         UserManager users = ServletUtils.getUserManager(getServletContext());
-        UBoat uboat = users.getUboat(userFromSession);
+        UBoat uboat = users.getUboat(uboatName);
 
         if(uboat == null){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("Cannot fetch competing teams.. UBoat " + userFromSession + " was not found." );
+            response.setContentType("text/plain");
+            response.getWriter().print("Cannot fetch competing teams.. UBoat " + uboatName + " was not found." );
             return;
         }
 

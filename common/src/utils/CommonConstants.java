@@ -15,6 +15,7 @@ public class CommonConstants {
     // Server resources locations
     public final static String BASE_DOMAIN = "localhost";
     public static final String CANDIDATE_PARAM = "candidate";
+    public static final String ICON_RESOURCE = "/images/turing_icon.png";
     private final static String BASE_URL = "http://" + BASE_DOMAIN + ":8080";
     private final static String CONTEXT_PATH = "cracking-enigma";
     private final static String FULL_SERVER_PATH = BASE_URL + CONTEXT_PATH;

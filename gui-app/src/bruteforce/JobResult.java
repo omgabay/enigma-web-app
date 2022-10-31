@@ -8,7 +8,7 @@ public class JobResult {
     private final boolean successful;
     private final List<String> solutions;
 
-    AgentJob completedJob;
+    AgentTask completedJob;
 
 
 
@@ -21,7 +21,7 @@ public class JobResult {
 
     }
 
-    public JobResult(String agentName, List<String> solutions , AgentJob request, boolean successful){
+    public JobResult(String agentName, List<String> solutions , AgentTask request, boolean successful){
         this(agentName, solutions, successful);
         this.completedJob = request;
     }

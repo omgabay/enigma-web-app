@@ -34,7 +34,7 @@ public class AlliesClient extends Application {
 
     @FXML TextField usernameInput;
     @FXML Label errorMessageLabel;
-
+    private AlliesController alliesController;
 
 
     public void initialize(){
@@ -46,9 +46,8 @@ public class AlliesClient extends Application {
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource(LOGIN_PAGE_FXML_RESOURCE_LOCATION));
             loader.setController(this);
-            stage = primaryStage;
+            this.stage = primaryStage;
             Parent root = loader.load();
-
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -58,18 +57,14 @@ public class AlliesClient extends Application {
     }
 
 
-    @Override
-    public void stop() throws Exception {
-        HttpClientUtil.shutdown();
-    }
 
 
     @FXML
     private void registerAlly(ActionEvent actionEvent){
 
-        String userName = usernameInput.getText();
+        String allyName = usernameInput.getText();
 
-        if(userName.isEmpty()){
+        if(allyName.isEmpty()){
             errorMessageProperty.set("Name field is empty, you cannot login with no name");
             return;
         }
@@ -77,7 +72,7 @@ public class AlliesClient extends Application {
         String finalUrl = HttpUrl
                 .parse(Configuration.LOGIN_PAGE)
                 .newBuilder()
-                .addQueryParameter("username", userName)
+                .addQueryParameter("username", allyName)
                 .addQueryParameter("type", "ally")
                 .build()
                 .toString();
@@ -90,7 +85,7 @@ public class AlliesClient extends Application {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if(response.isSuccessful()){
                     Platform.runLater(() ->
-                            loadAllyScreen()
+                            loadAllyScreen(allyName)
                     );
                 }
             }
@@ -106,10 +101,10 @@ public class AlliesClient extends Application {
 
     }
 
-    private void loadAllyScreen(){
+    private void loadAllyScreen(String allyName){
         FXMLLoader loader = new FXMLLoader(getClass().getResource(MAIN_PAGE_FXML_RESOURCE_LOCATION));
-//        AlliesController allyController = new AlliesController();
-//        loader.setController(allyController);
+        this.alliesController = new AlliesController(allyName);
+        loader.setController(alliesController);
         Parent root = null;
         try {
             root = loader.load();
@@ -118,8 +113,17 @@ public class AlliesClient extends Application {
         }
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        alliesController.setStage(stage);
+
         stage.show();
     }
 
+
+
+    @Override
+    public void stop() throws Exception {
+        HttpClientUtil.shutdown();
+        alliesController.close();
+    }
 
 }

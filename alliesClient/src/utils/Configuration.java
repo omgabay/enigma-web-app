@@ -1,6 +1,7 @@
 package utils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Configuration {
 
@@ -28,7 +29,9 @@ public class Configuration {
 
 
     // GSON instance
-    public final static Gson GSON_INSTANCE = new Gson();
+
+    public final static Gson GSON_INSTANCE = new GsonBuilder().setPrettyPrinting().create();
+    //public final static Gson GSON_INSTANCE = new Gson();
 
 
 

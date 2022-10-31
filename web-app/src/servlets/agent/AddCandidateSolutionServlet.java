@@ -1,52 +1,70 @@
 package servlets.agent;
 
 import bruteforce.AgentSolutionEntry;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
-import users.AgentEntry;
 import users.UBoat;
-import users.UserManager;
 import utils.Constants;
 import utils.servlet.ServletUtils;
-import utils.servlet.SessionUtils;
 
 import java.io.*;
+
+import static utils.Constants.*;
 
 public class AddCandidateSolutionServlet extends HttpServlet {
 
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        // Getting candidate in JSON format
-        String candidateJson = request.getParameter(Constants.CANDIDATE_PARAM);
-
-        // Getting Uboat name
-        String uboatName = request.getParameter(Constants.UBOAT);
-
-        AgentSolutionEntry solutionEntry = Constants.GSON_INSTANCE.fromJson(candidateJson, AgentSolutionEntry.class);
-        UBoat uboat = ServletUtils.getUserManager(getServletContext()).getUboat(uboatName);
-
-        if(uboat == null || candidateJson == null || candidateJson.isEmpty()){
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String uboatName = request.getParameter(UBOAT_PARAM);
+        String candidateJson = request.getParameter(CANDIDATE_PARAM);
+        if(candidateJson == null){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        uboat.getSolutionsManager().addCandidateSolution(solutionEntry);
-        PrintWriter writer = response.getWriter();
-        String jsonResponse = Constants.GSON_INSTANCE.toJson(solutionEntry);
-        writer.print(jsonResponse);
-        writer.flush();
-        response.setStatus(HttpServletResponse.SC_OK);
-
+        AgentSolutionEntry solutionEntry = GSON_INSTANCE.fromJson(candidateJson, AgentSolutionEntry.class);
 
 
 
     }
+}
+//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
+//        response.setContentType("application/json");
+//
+//        // Getting candidate in JSON format
+//        String candidate = request.getParameter(Constants.CANDIDATE_PARAM);
+//        String agent = request.getParameter(Constants.AGENT_PARAM);
+//        String team = request.getParameter(Constants.TEAM_NAME_PARAM);
+//        String machineCode = request.getParameter(Constants.MACHINECODE_PARAM);
+//
+//
+//        // Getting Uboat name
+//        String uboatName = request.getParameter(Constants.UBOAT_PARAM);
+//        UBoat uboat = ServletUtils.getUserManager(getServletContext()).getUboat(uboatName);
+//
+//        if(uboat == null || candidate== null || agent == null || machineCode == null){
+//            response.setContentType("text/plain");
+//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//            return;
+//        }
+//
+//        AgentSolutionEntry solutionEntry = new AgentSolutionEntry(agent,team,candidate,machineCode);
+//
+//        uboat.addAgentSolution(solutionEntry);
+//
+//        try(PrintWriter writer = response.getWriter()){
+//            String jsonResponse = Constants.GSON_INSTANCE.toJson(solutionEntry);
+//            writer.print(jsonResponse);
+//            writer.flush();
+//        }
+//
+//        response.setStatus(HttpServletResponse.SC_OK);
+//
+//
+//
+//
+//    }
 
 //    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
 //        System.out.println("In get");
@@ -97,5 +115,4 @@ public class AddCandidateSolutionServlet extends HttpServlet {
 //       response.setStatus(HttpServletResponse.SC_OK);
 //
 //    }
-
-}
+//}

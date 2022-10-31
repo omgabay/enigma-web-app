@@ -60,18 +60,6 @@
 
 
     <servlet>
-        <servlet-name>StartGame</servlet-name>
-        <servlet-class>servlets.uboat.StartGameServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>StartGame</servlet-name>
-        <url-pattern>/game/start</url-pattern>
-    </servlet-mapping>
-
-
-
-
-    <servlet>
         <servlet-name>GetTeamServlet</servlet-name>
         <servlet-class>servlets.allies.GetTeamServlet</servlet-class>
     </servlet>
@@ -142,7 +130,7 @@
 
     <servlet>
         <servlet-name>ReadyUpdate</servlet-name>
-        <servlet-class>servlets.allies.ReadyUpdateServlet</servlet-class>
+        <servlet-class>servlets.ReadyUpdateServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -153,13 +141,35 @@
 
     <servlet>
         <servlet-name>GetUBoatList</servlet-name>
-        <servlet-class>servlets.allies.GetUBoatsServlet</servlet-class>
+        <servlet-class>servlets.uboat.GetUBoatsServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>GetUBoatList</servlet-name>
         <url-pattern>/uboats</url-pattern>
     </servlet-mapping>
+
+
+
+    <servlet>
+        <servlet-name>AddAgent</servlet-name>
+        <servlet-class>servlets.allies.AddAgentToTeamServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddAgent</servlet-name>
+        <url-pattern>/team/addAgent</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>Get List of all teams</servlet-name>
+        <servlet-class>servlets.allies.GetAllTeamsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Get List of all teams</servlet-name>
+        <url-pattern>/allTeams</url-pattern>
+    </servlet-mapping>
+
 
 
 

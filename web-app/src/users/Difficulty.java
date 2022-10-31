@@ -1,3 +1,3 @@
 package users;
 
-public enum Difficulty {EASY, MEDIUM, HARD, INSANE}
+public enum Difficulty {LOAD_ENIGMA, EASY, MEDIUM, HARD, INSANE}

@@ -1,6 +1,6 @@
 package main;
 
-import controllers.AgentLoginController;
+import controllers.login.AgentLoginController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,15 +13,15 @@ import java.io.IOException;
 public class AgentClient extends Application {
 
     private static final String LOGIN_PAGE_FXML_RESOURCE_LOCATION = "/fxml/AgentLogin.fxml";
-
+    AgentLoginController loginController;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource(LOGIN_PAGE_FXML_RESOURCE_LOCATION));
             Parent root = loader.load();
-            AgentLoginController controller = loader.getController();
-            controller.setStage(primaryStage);
+            loginController = loader.getController();
+            loginController.setStage(primaryStage);
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -34,6 +34,7 @@ public class AgentClient extends Application {
     @Override
     public void stop() throws Exception {
         HttpClientUtil.shutdown();
+        loginController.close();
     }
 
 

@@ -28,7 +28,7 @@ public class DeclareWinnerServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-        String agentName = request.getParameter(Constants.AGENT_NAME_PARAM);
+        String agentName = request.getParameter(Constants.AGENT_PARAM);
         // Get the winner agent in the contest
         AgentEntry theWinner = users.getAgent(agentName);
 

@@ -1,6 +1,5 @@
 package servlets.allies;
 
-import com.sun.org.apache.bcel.internal.Const;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,38 +11,33 @@ import utils.servlet.ServletUtils;
 import utils.servlet.SessionUtils;
 
 import java.io.IOException;
-import java.util.List;
 
 public class JoinContestServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
-        String username = request.getParameter(Constants.USERNAME);
+        String teamName = request.getParameter(Constants.USERNAME);
+        String uboatName = request.getParameter(Constants.UBOAT_PARAM);
 
-        if(username == null){
-            username = SessionUtils.getUsername(request);
+        if(teamName == null){
+            teamName = SessionUtils.getUsername(request);
         }
+
         UserManager users = ServletUtils.getUserManager(getServletContext());
-        AllyTeam allyTeam = users.getTeam(username);
 
 
+        UBoat contest = users.joinContest(uboatName,teamName);
 
-
-        String uboatFromParameter = request.getParameter(Constants.UBOAT);
-
-        UBoat uboat = users.getUboat(uboatFromParameter);
-
-        if(uboat == null){
-            response.getWriter().print("Uboat was not found uboat=" + uboatFromParameter + " team=" + username);
+        // uboat was not found
+        if(contest == null){
+            response.getWriter().print("Uboat was not found uboat=" + uboatName + " team=" + teamName);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-
-        uboat.addTeam(allyTeam);
-        List<AllyTeam> teamList = uboat.getAllyTeams();
         response.setContentType("application/json");
-        String teamsListJson = Constants.GSON_INSTANCE.toJson(teamList);
-        response.getWriter().print(teamsListJson);
+        String uboatJson = Constants.GSON_INSTANCE.toJson(contest);
+        response.getWriter().print(uboatJson);
         response.setStatus(HttpServletResponse.SC_OK);
+
     }
 }

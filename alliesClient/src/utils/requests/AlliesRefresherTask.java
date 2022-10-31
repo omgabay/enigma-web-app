@@ -7,6 +7,7 @@ import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import users.AgentEntry;
+import users.AllyTeam;
 import users.UBoat;
 import utils.Constants;
 import utils.http.HttpClientUtil;
@@ -22,7 +23,10 @@ public class AlliesRefresherTask extends TimerTask {
     private Consumer<List<UBoat>> uboatConsumer;
     private Consumer<List<AgentEntry>> updateTable;
 
-    public AlliesRefresherTask(Consumer<List<UBoat>> uboatConsumer, Consumer<List<AgentEntry>> updateAgentsTable){
+    private String clientName;
+
+    public AlliesRefresherTask(String name, Consumer<List<UBoat>> uboatConsumer, Consumer<List<AgentEntry>> updateAgentsTable){
+        this.clientName = name;
         this.uboatConsumer = uboatConsumer;
         this.updateTable = updateAgentsTable;
     }
@@ -48,6 +52,31 @@ public class AlliesRefresherTask extends TimerTask {
                     String rawBody = response.body().string();
                     List<UBoat> uboats = GSON_INSTANCE.fromJson(rawBody,new TypeToken<List<UBoat>>(){}.getType());
                     uboatConsumer.accept(uboats);
+                }
+            }
+        });
+
+
+        finalUrl = HttpUrl
+                .parse(Constants.GET_USER_RESOURCE_PAGE)
+                .newBuilder()
+                .addQueryParameter(Constants.USERNAME, clientName)
+                .build()
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.isSuccessful()){
+                    String rawBody = response.body().string();
+                    System.out.println(rawBody);
+                    AllyTeam myTeam = GSON_INSTANCE.fromJson(rawBody, AllyTeam.class);
+                    updateTable.accept(myTeam.getAgentList());
                 }
             }
         });

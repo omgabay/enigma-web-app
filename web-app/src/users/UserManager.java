@@ -8,17 +8,17 @@ public class UserManager {
     private final  List<String> teams;
     private final List<UBoat> uboats;
 
-    private final Map<String, AllyTeam> mapAllyTeams;
+    private final List<String>  allyTeams;
 
-
-
+    private final Map<String, UBoat> mapTeamToUBoat;
 
 
     public UserManager() {
         mapNameToUser = new HashMap<>();
+        mapTeamToUBoat = new HashMap<>();
         teams = new ArrayList<>();
         uboats = new ArrayList<>();
-        mapAllyTeams = new HashMap<>();
+        allyTeams = new ArrayList<>();
 
     }
 
@@ -32,13 +32,13 @@ public class UserManager {
                     if(mapNameToUser.get(teamName) instanceof AllyTeam){
                         AllyTeam team = (AllyTeam) mapNameToUser.get(teamName);
                         team.addAgentToTeam(agent);
+                        System.out.println(agent.username + " was added to team " + teamName);
                     }
                 }
                 break;
             case ALLY:
                 System.out.println("welcome team " + username +"!");
-                teams.add(username);
-                mapAllyTeams.put(username, (AllyTeam) user);
+                allyTeams.add(username);
                 break;
             case UBOAT:
                 System.out.println("welcome uboat " + username +"!");
@@ -104,5 +104,30 @@ public class UserManager {
 
     public List<UBoat> getAllUBoats() {
         return this.uboats;
+    }
+
+    public List<String> getAllTeams() {
+        return this.allyTeams;
+    }
+
+
+    public UBoat getUboatByTeamName(String teamName) {
+
+        if(this.mapTeamToUBoat.containsKey(teamName)){
+            return this.mapTeamToUBoat.get(teamName);
+        }
+        return null;
+
+    }
+
+    public UBoat joinContest(String uboatName, String teamName) {
+        UBoat contest = getUboat(uboatName);
+        AllyTeam team = getTeam(teamName);
+        if(contest == null || team == null){
+            return null;
+        }
+        mapTeamToUBoat.put(teamName,contest);
+        contest.addTeam(team);
+        return contest;
     }
 }

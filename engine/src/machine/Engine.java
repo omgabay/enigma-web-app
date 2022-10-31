@@ -75,7 +75,7 @@ public class Engine implements IEngine {
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         CTEEnigma cteEnigma =  (CTEEnigma) jaxbUnmarshaller.unmarshal(xml);
 
-        this.validateAndLoad(cteEnigma);
+        this.loadCTEnigma(cteEnigma);
         isLoaded = true;
         isMachinePresent = false;
         MachineSettings settings = new MachineSettings(rotorsCount, rotorList.size(), reflectorList.size(), this.alphabet);
@@ -87,7 +87,7 @@ public class Engine implements IEngine {
         JAXBContext jaxbContext = JAXBContext.newInstance(CTEEnigma.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         CTEEnigma cteEnigma =  (CTEEnigma) jaxbUnmarshaller.unmarshal(inputStream);
-        this.validateAndLoad(cteEnigma);
+        this.loadCTEnigma(cteEnigma);
         return cteEnigma;
     }
 
@@ -95,11 +95,12 @@ public class Engine implements IEngine {
     public void loadFromJson(String json) {
         Gson gson = new Gson();
         CTEEnigma cteEnigma  = gson.fromJson(json, CTEEnigma.class);
-        this.validateAndLoad(cteEnigma);
+        this.loadCTEnigma(cteEnigma);
     }
 
 
-    private void validateAndLoad(CTEEnigma cteEnigma){
+
+    public void loadCTEnigma(CTEEnigma cteEnigma){
         CTEMachine m = cteEnigma.getCTEMachine();
         this.alphabet = new Alphabet(m.getABC().trim());
 
@@ -222,7 +223,7 @@ public class Engine implements IEngine {
         Plugboard pb = new Plugboard(this.alphabet);
         for (char letter : alphabet.getABC()) {
             int probability = r.nextInt(100);
-            if(probability >= 90){
+            if(probability > 100){
                 char letter2  = alphabet.getLetter(r.nextInt(alphabet.size()));
                 if(letter != letter2){
                     // addToPlugboard will not add the pair in case one of the letters is in use

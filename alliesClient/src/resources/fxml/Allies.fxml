@@ -20,8 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<ScrollPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AlliesController">
+<ScrollPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <content>
       <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="729.0" prefWidth="1157.0">
          <top>
@@ -45,16 +44,33 @@
                                  <center>
                                     <VBox prefHeight="606.0" prefWidth="1085.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <TableView fx:id="agentsTable" prefHeight="606.0" prefWidth="909.0">
+                                          <TableView fx:id="agentsTable" prefWidth="909.0">
                                             <columns>
-                                              <TableColumn fx:id="agentNameCol" prefWidth="104.0" resizable="false" text="Agent Name" />
-                                              <TableColumn fx:id="agentWorkersCol" prefWidth="168.0" text="Number of Workers" />
-                                                <TableColumn fx:id="taskSizeCol" prefWidth="99.0" text="Task Size" />
+                                              <TableColumn fx:id="agentNameCol" prefWidth="142.66668701171875" resizable="false" text="Agent Name" />
+                                              <TableColumn fx:id="agentWorkersCol" prefWidth="186.33331298828125" text="Number of Workers" />
+                                                <TableColumn fx:id="taskSizeCol" prefWidth="206.33331298828125" text="Task Size" />
                                             </columns>
                                              <VBox.margin>
                                                 <Insets bottom="10.0" />
                                              </VBox.margin>
                                           </TableView>
+                                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                                             <padding>
+                                                <Insets bottom="20.0" top="20.0" />
+                                             </padding>
+                                             <children>
+                                                <Label text="Name:" />
+                                                <TextField fx:id="agentNameLabel" alignment="CENTER" prefHeight="25.0" prefWidth="80.0" promptText="Optional" />
+                                                <Button mnemonicParsing="false" onAction="#addAgentToTeam" text="Add Agent Automatically">
+                                                   <padding>
+                                                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                   </padding>
+                                                   <HBox.margin>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </HBox.margin>
+                                                </Button>
+                                             </children>
+                                          </HBox>
                                        </children>
                                     </VBox>
                                  </center>
@@ -186,10 +202,10 @@
                                           <Label text="UBoat Name:" GridPane.rowIndex="1" />
                                           <Label text="Contest Status: " GridPane.rowIndex="2" />
                                           <Label text="Difficulty:" GridPane.rowIndex="4" />
-                                          <Label text="Waiting for Registration" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                          <Label text="Name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                          <Label text="Battlefield Name" GridPane.columnIndex="1" />
-                                          <Label text="Easy" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                          <Label fx:id="statusLabel" text="Waiting for Registration" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                          <Label fx:id="uboatLabel" text="Name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                          <Label fx:id="battleLabel" text="Battlefield Name" GridPane.columnIndex="1" />
+                                          <Label fx:id="difficultyLabel" text="Easy" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                           <Label text="Registered:" GridPane.rowIndex="3" />
                                           <HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="6">
                                              <children>
@@ -198,13 +214,13 @@
                                           </HBox>
                                           <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                                              <children>
-                                                <Button mnemonicParsing="false" text="-50" textFill="#2222c9">
+                                                <Button mnemonicParsing="false" onAction="#minus50" text="-50" textFill="#2222c9">
                                                    <font>
                                                       <Font name="Arial Black" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <TextField alignment="CENTER" editable="false" prefHeight="25.0" prefWidth="45.0" text="900" />
-                                                <Button mnemonicParsing="false" text="+50" textFill="#2222c9">
+                                                <TextField fx:id="missionSizeTF" alignment="CENTER" editable="false" prefHeight="25.0" prefWidth="45.0" text="900" />
+                                                <Button mnemonicParsing="false" onAction="#plus50" text="+50" textFill="#2222c9">
                                                    <font>
                                                       <Font name="Arial Black" size="12.0" />
                                                    </font>
@@ -212,6 +228,7 @@
                                              </children>
                                           </HBox>
                                           <Label text="Mission Size:" GridPane.rowIndex="5" />
+                                          <Label fx:id="registeredLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                        </children>
                                        <BorderPane.margin>
                                           <Insets left="10.0" />

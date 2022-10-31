@@ -14,8 +14,6 @@ import users.UserManager;
 import utils.Constants;
 import utils.servlet.ServletUtils;
 import utils.servlet.SessionUtils;
-
-import javax.xml.bind.JAXBException;
 import java.io.*;
 
 
@@ -72,13 +70,6 @@ public class FileUploadServlet extends HttpServlet {
         uboat.setMachine(cteEnigma);
     }
 
-
-
-
-    private void printFileContent(String content, PrintWriter out) {
-        out.println("File content:");
-        out.println(content);
-    }
 
 
 }

@@ -14,7 +14,7 @@ public class DecryptionManger implements Runnable {
     private final List<Agent> agentList;
 
 
-    private final BlockingQueue<AgentJob> queue;
+    private final BlockingQueue<AgentTask> queue;
     private final static int QUEUE_SIZE = 5;
 
     private final Thread handlerThread;
@@ -102,7 +102,7 @@ public class DecryptionManger implements Runnable {
                         System.out.println("Incrementor value: " + currentCount);
                     }
 
-                    List<AgentJob> agentJobs = incrementor.getNewJobs();
+                    List<AgentTask> agentJobs = incrementor.getNewJobs();
                     if(agentJobs == null){
                         continue;
                     }
@@ -114,7 +114,7 @@ public class DecryptionManger implements Runnable {
 
 
                     try {
-                        for (AgentJob job : agentJobs) {
+                        for (AgentTask job : agentJobs) {
                             queue.put(job);
                         }
                     } catch (InterruptedException e) {
